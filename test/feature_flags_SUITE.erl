@@ -686,7 +686,7 @@ mark_feature_flag_as_enabled_with_a_network_partition(Config) ->
 
     RepairFun = fun() ->
                         %% Wait a few seconds before we repair the network.
-                        timer:sleep(5000),
+                        timer:sleep(3000),
 
                         %% Repair the network and try again to enable
                         %% the feature flag.
@@ -704,7 +704,7 @@ mark_feature_flag_as_enabled_with_a_network_partition(Config) ->
        rabbit_ct_broker_helpers:rpc(
          Config, B,
          rabbit_feature_flags, mark_as_enabled_remotely,
-         [RemoteNodes, FeatureName, true, 120000])).
+         [RemoteNodes, FeatureName, true, 60000])).
 
 %% FIXME: Finish the testcase above ^
 
