@@ -543,6 +543,7 @@ restart_all_types(Config) ->
     %% The stream coordinator is also a ra process, we need to ensure the quorum tests
     %% are not affected by any other ra cluster that could be added in the future
     Children = rpc:call(Server, supervisor, which_children, [ra_server_sup_sup]),
+    ct:pal("Initial children: ~p", [Children]),
 
     Ch = rabbit_ct_client_helpers:open_channel(Config, Server),
     QQ1 = <<"restart_all_types-qq1">>,
@@ -570,12 +571,13 @@ restart_all_types(Config) ->
     Expected = length(Children) + 2,
     ok = rabbit_ct_helpers:await_condition(
            fun() ->
-                   Expected =:= length(
-                                  rpc:call(
-                                    Server,
-                                    supervisor,
-                                    which_children,
-                                    [ra_server_sup_sup]))
+                   Children1 = rpc:call(
+                                 Server,
+                                 supervisor,
+                                 which_children,
+                                 [ra_server_sup_sup]),
+                   ct:pal("Children after restart: ~p", [Children1]),
+                   Expected =:= length(Children1)
            end, 60000),
     %% Check the classic queues restarted correctly
     Ch2 = rabbit_ct_client_helpers:open_channel(Config, Server),
