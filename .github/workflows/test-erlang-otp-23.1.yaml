@@ -138,6 +138,147 @@ jobs:
           export BASE_RMQ_REF=master
           export ERLANG_VERSION=23.1
           export ELIXIR_VERSION=1.10.4
+          set -e
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
+          make ct-quorum_queue \
+            base_rmq_ref=master \
+            current_rmq_ref=$branch_or_tag_name \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            CT_OPTS="-ct_hooks honeycomb_cth '[{directory,\"$PWD/honeycomb\"}]'"
           make ct-quorum_queue \
             base_rmq_ref=master \
             current_rmq_ref=$branch_or_tag_name \
