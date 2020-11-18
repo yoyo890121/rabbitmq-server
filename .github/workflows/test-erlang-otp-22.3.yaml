@@ -96,11 +96,6 @@ jobs:
         echo "::set-output name=step_start::$(date +%s)"
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
-    - name: VALIDATE KNOWN CT SUITES
-      env:
-        project: rabbit
-      run: |
-        ci/scripts/validate-workflow.sh cluster_rename
     - name: RUN CHECKS
       uses: docker/build-push-action@v1
       with:

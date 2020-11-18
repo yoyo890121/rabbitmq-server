@@ -18,13 +18,6 @@ steps:
       echo "::set-output name=step_start::$(date +%s)"
   - name: CHECKOUT REPOSITORY
     uses: actions/checkout@v2
-  - name: VALIDATE KNOWN CT SUITES
-    env:
-      project: #@ dep.name
-    #@ suite_names = [suite.name for suite in dep.suites]
-    #@ None if is_unique(suite_names) else assert.fail('{} suite names are not unique'.format(dep.name))
-    run: |
-      ci/scripts/validate-workflow.sh (@= " ".join(suite_names) @)
   - name: RUN CHECKS
     uses: docker/build-push-action@v1
     with:
