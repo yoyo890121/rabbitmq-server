@@ -163,7 +163,126 @@ jobs:
       run: |
         gcloud auth configure-docker
         docker pull eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }}
-    - name: RUN ct-cluster_rename
+    - name: RUN ct-cluster_rename 0
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 1
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 2
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 3
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 4
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 5
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 6
+      run: |
+        mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
+        docker run \
+          --env project=rabbit \
+          --env CT_SUITE=cluster_rename \
+          --env GITHUB_RUN_ID=${{ github.run_id }} \
+          --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
+          --volume ${PWD}/ct-cluster_rename-logs:/workspace/ct-logs \
+          eu.gcr.io/cf-rabbitmq-core/ci-rabbit:erlang-23.1-rabbitmq-${{ github.sha }} \
+          /workspace/rabbitmq/ci/scripts/ct-suite.sh
+    - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
+      uses: actions/upload-artifact@v2-preview
+      if: always()
+      with:
+        name: rabbit-ct-cluster_rename-logs
+        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+    - name: RUN ct-cluster_rename 7
       run: |
         mkdir ct-cluster_rename-logs && chmod 777 ct-cluster_rename-logs
         docker run \
