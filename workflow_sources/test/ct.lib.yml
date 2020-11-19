@@ -76,7 +76,7 @@ steps:
   #@ if erlang_version == data.values.erlang_versions[0]:
   #@ for version in data.values.secondary_umbrella_gitrefs:
   #@   logs_dir = 'ct-{}-logs-{}'.format(suite, version)
-  - name: #@ "RUN ct-{} {} [mixed {}]".format(i, suite, version)
+  - name: #@ "RUN ct-{} {} [mixed {}]".format(suite, i, version)
     run: |
       mkdir (@= logs_dir @) && chmod 777 (@= logs_dir @)
       docker run \
