@@ -241,23 +241,50 @@ stop_rename_start(Config, Nodename, Map) ->
     ExpectedRunningNodeCount = NodeCount - 1,
     NodeRenameConfigIdx = rabbit_ct_broker_helpers:nodename_to_index(Config, Nodename),
     NodeIdxsToCheck = [N || N <- NodeIndexes, N =/= NodeRenameConfigIdx],
+
+    ct:pal("@@@@@@@@ stop_rename_start stop_node Nodename: ~p", [Nodename]),
     ok = rabbit_ct_broker_helpers:stop_node(Config, Nodename),
     P0 = fun(NodeIdx) ->
-             ExpectedRunningNodeCount =:= length(cluster_members_online(Config, NodeIdx))
+             CMemOnline0 = cluster_members_online(Config, NodeIdx),
+             ct:pal("@@@@@@@@ stop_rename_start after stop_node NodeIdx: ~p CMemOnline0: ~p", [NodeIdx, CMemOnline0]),
+             ExpectedRunningNodeCount =:= length(CMemOnline0)
          end,
     C0 = fun() ->
              lists:all(P0, NodeIdxsToCheck)
          end,
-    ok = rabbit_ct_helpers:await_condition(C0, 30000),
+    ok = rabbit_ct_helpers:await_condition(C0, 10000),
+
+    ct:pal("@@@@@@@@ stop_rename_start rename_node Nodename: ~p", [Nodename]),
     Config1 = rename_node(Config, Nodename, Map),
     P1 = fun(NodeIdx) ->
-             ExpectedRunningNodeCount =:= length(cluster_members_online(Config1, NodeIdx))
+             CMemOnline1 = cluster_members_online(Config1, NodeIdx),
+             ct:pal("@@@@@@@@ stop_rename_start after rename_node NodeIdx: ~p CMemOnline1: ~p", [NodeIdx, CMemOnline1]),
+             ok = case length(CMemOnline1) of
+                      ExpectedRunningNodeCount ->
+                          ok;
+                      UnexpectedCount ->
+                          ct:pal("@@@@@@@@ stop_rename_start after rename_node WHOA NodeIdx: ~p UnexpectedCount: ~p CMemOnline1: ~p", [NodeIdx, UnexpectedCount, CMemOnline1]),
+                          ok
+                  end,
+             true
          end,
     C1 = fun() ->
              lists:all(P1, NodeIdxsToCheck)
          end,
-    ok = rabbit_ct_helpers:await_condition(C1, 30000),
+    ok = rabbit_ct_helpers:await_condition(C1, 10000),
+
+    ct:pal("@@@@@@@@ stop_rename_start start_node Nodename: ~p", [Nodename]),
     ok = rabbit_ct_broker_helpers:start_node(Config1, Nodename),
+    P2 = fun(NodeIdx) ->
+             CMemOnline2 = cluster_members_online(Config1, NodeIdx),
+             ct:pal("@@@@@@@@ stop_rename_start after start_node NodeIdx: ~p CMemOnline2: ~p", [NodeIdx, CMemOnline2]),
+             NodeCount =:= length(CMemOnline2)
+         end,
+    C2 = fun() ->
+             lists:all(P2, NodeIndexes)
+         end,
+    ok = rabbit_ct_helpers:await_condition(C2, 10000),
+
     Config1.
 
 rename_node(Config, Nodename, Map) ->
