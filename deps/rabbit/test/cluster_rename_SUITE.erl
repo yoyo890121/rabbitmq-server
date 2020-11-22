@@ -247,6 +247,7 @@ stop_rename_start(Config, Nodename, Map) ->
     P0 = fun(NodeIdx) ->
              CMemOnline0 = cluster_members_online(Config, NodeIdx),
              ct:pal("@@@@@@@@ stop_rename_start after stop_node NodeIdx: ~p CMemOnline0: ~p", [NodeIdx, CMemOnline0]),
+             [ct:pal("@@@@@@@@ ping result: ~p", [net_adm:ping(CMem)]) || CMem <- CMemOnline0],
              ExpectedRunningNodeCount =:= length(CMemOnline0)
          end,
     C0 = fun() ->
@@ -259,6 +260,7 @@ stop_rename_start(Config, Nodename, Map) ->
     P1 = fun(NodeIdx) ->
              CMemOnline1 = cluster_members_online(Config1, NodeIdx),
              ct:pal("@@@@@@@@ stop_rename_start after rename_node NodeIdx: ~p CMemOnline1: ~p", [NodeIdx, CMemOnline1]),
+             [ct:pal("@@@@@@@@ ping result: ~p", [net_adm:ping(CMem)]) || CMem <- CMemOnline1],
              ok = case length(CMemOnline1) of
                       ExpectedRunningNodeCount ->
                           ok;
@@ -278,6 +280,7 @@ stop_rename_start(Config, Nodename, Map) ->
     P2 = fun(NodeIdx) ->
              CMemOnline2 = cluster_members_online(Config1, NodeIdx),
              ct:pal("@@@@@@@@ stop_rename_start after start_node NodeIdx: ~p CMemOnline2: ~p", [NodeIdx, CMemOnline2]),
+             [ct:pal("@@@@@@@@ ping result: ~p", [net_adm:ping(CMem)]) || CMem <- CMemOnline2],
              NodeCount =:= length(CMemOnline2)
          end,
     C2 = fun() ->
