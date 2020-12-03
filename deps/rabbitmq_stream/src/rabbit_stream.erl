@@ -15,89 +15,105 @@
 %%
 
 -module(rabbit_stream).
+
 -behaviour(application).
 
 -export([start/2, host/0, port/0, kill_connection/1]).
+
 -export([stop/1]).
+
 -export([emit_connection_info_local/3,
-    emit_connection_info_all/4,
-    list/0]).
+         emit_connection_info_all/4,
+         list/0]).
 
 -include_lib("rabbit_common/include/rabbit.hrl").
 
-start(_Type, _Args) ->
-    rabbit_stream_sup:start_link().
+start(_Type, _Args) -> rabbit_stream_sup:start_link().
 
 host() ->
-    case application:get_env(rabbitmq_stream, advertised_host, undefined) of
-        undefined ->
-            hostname_from_node();
-        Host ->
-            rabbit_data_coercion:to_binary(Host)
+    case application:get_env(rabbitmq_stream,
+                             advertised_host,
+                             undefined)
+        of
+        undefined -> hostname_from_node();
+        Host -> rabbit_data_coercion:to_binary(Host)
     end.
 
 hostname_from_node() ->
     case re:split(rabbit_data_coercion:to_binary(node()),
                   "@",
-                  [{return, binary}, {parts, 2}]) of
-        [_, Hostname] ->
-            Hostname;
+                  [{return, binary}, {parts, 2}])
+        of
+        [_, Hostname] -> Hostname;
         [_] ->
             rabbit_data_coercion:to_binary(inet:gethostname())
     end.
 
 port() ->
-    case application:get_env(rabbitmq_stream, advertised_port, undefined) of
-        undefined ->
-            port_from_listener();
-        Port ->
-            Port
+    case application:get_env(rabbitmq_stream,
+                             advertised_port,
+                             undefined)
+        of
+        undefined -> port_from_listener();
+        Port -> Port
     end.
 
 port_from_listener() ->
     Listeners = rabbit_networking:node_listeners(node()),
-    Port = lists:foldl(fun(#listener{port = Port, protocol = stream}, _Acc) ->
-        Port;
-        (_, Acc) ->
-            Acc
-                       end, undefined, Listeners),
+    Port = lists:foldl(fun (#listener{port = Port,
+                                      protocol = stream},
+                            _Acc) ->
+                               Port;
+                           (_, Acc) -> Acc
+                       end,
+                       undefined,
+                       Listeners),
     Port.
 
-stop(_State) ->
-    ok.
+stop(_State) -> ok.
 
 kill_connection(ConnectionName) ->
-    ConnectionNameBin = rabbit_data_coercion:to_binary(ConnectionName),
-    lists:foreach(fun(ConnectionPid) ->
-        ConnectionPid ! {infos, self()},
-        receive
-            {ConnectionPid, #{<<"connection_name">> := ConnectionNameBin}} ->
-                exit(ConnectionPid, kill);
-            {ConnectionPid, _ClientProperties} ->
-                ok
-        after 1000 ->
-            ok
-        end
-                  end, pg_local:get_members(rabbit_stream_connections)).
+    ConnectionNameBin =
+        rabbit_data_coercion:to_binary(ConnectionName),
+    lists:foreach(fun (ConnectionPid) ->
+                          ConnectionPid ! {infos, self()},
+                          receive
+                              {ConnectionPid,
+                               #{<<"connection_name">> := ConnectionNameBin}} ->
+                                  exit(ConnectionPid, kill);
+                              {ConnectionPid, _ClientProperties} -> ok
+                              after 1000 -> ok
+                          end
+                  end,
+                  pg_local:get_members(rabbit_stream_connections)).
 
-emit_connection_info_all(Nodes, Items, Ref, AggregatorPid) ->
-    Pids = [spawn_link(Node, rabbit_stream, emit_connection_info_local,
-        [Items, Ref, AggregatorPid])
-        || Node <- Nodes],
+emit_connection_info_all(Nodes, Items, Ref,
+                         AggregatorPid) ->
+    Pids = [spawn_link(Node,
+                       rabbit_stream,
+                       emit_connection_info_local,
+                       [Items, Ref, AggregatorPid])
+            || Node <- Nodes],
     rabbit_control_misc:await_emitters_termination(Pids),
     ok.
 
 emit_connection_info_local(Items, Ref, AggregatorPid) ->
-    rabbit_control_misc:emitting_map_with_exit_handler(
-        AggregatorPid, Ref, fun(Pid) ->
-            rabbit_stream_reader:info(Pid, Items)
-                            end,
-        list()).
+    rabbit_control_misc:emitting_map_with_exit_handler(AggregatorPid,
+                                                       Ref,
+                                                       fun (Pid) ->
+                                                               rabbit_stream_reader:info(Pid,
+                                                                                         Items)
+                                                       end,
+                                                       list()).
 
 list() ->
     [Client
-        || {_, ListSupPid, _, _} <- supervisor2:which_children(rabbit_stream_sup),
-        {_, RanchSup, supervisor, _} <- supervisor2:which_children(ListSupPid),
-        {ranch_conns_sup, ConnSup, _, _} <- supervisor:which_children(RanchSup),
+     || {_, ListSupPid, _, _}
+            <- supervisor2:which_children(rabbit_stream_sup),
+        {_, RanchSup, supervisor, _}
+            <- supervisor2:which_children(ListSupPid),
+        {ranch_conns_sup, ConnSup, _, _}
+            <- supervisor:which_children(RanchSup),
         {_, CliSup, _, _} <- supervisor:which_children(ConnSup),
-        {rabbit_stream_reader, Client, _, _} <- supervisor:which_children(CliSup)].
+        {rabbit_stream_reader, Client, _, _}
+            <- supervisor:which_children(CliSup)].
