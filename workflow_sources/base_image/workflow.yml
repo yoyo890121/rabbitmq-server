@@ -6,12 +6,12 @@
 
 #@ def erlang_image_name():
 #@   workflow_images = data.values.workflow_images
-#@   return "{}/{}:actions-erlang-elixir-${{ matrix.erlang_version }}".format(workflow_images.registry, workflow_images.repository)
+#@   return workflow_images.registry + "/" + workflow_images.repository + ":actions-erlang-elixir-${{ matrix.erlang_version }}"
 #@ end
 
 #@ def base_image_name():
 #@   workflow_images = data.values.workflow_images
-#@   return "{}/{}:actions-ci-base-${{ matrix.erlang_version }}".format(workflow_images.registry, workflow_images.repository)
+#@   return workflow_images.registry + "/" + workflow_images.repository + ":actions-ci-base-${{ matrix.erlang_version }}"
 #@ end
 
 ---
