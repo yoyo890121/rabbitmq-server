@@ -36,7 +36,7 @@ jobs:
       with:
         push: true
         file: ci/dockerfiles/${{ matrix.erlang_version }}/erlang_elixir
-        tags: ghcr.io/cf-rabbitmq-core/erlang_elixir:${{ matrix.erlang_version }}
+        tags: ghcr.io/rabbitmq/rabbitmq-server:actions-erlang-elixir-${ matrix.erlang_version }
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache
     - name: CREATE BASE CI IMAGE (${{ matrix.erlang_version }})
@@ -47,6 +47,6 @@ jobs:
         build-args: |
           ERLANG_VERSION=${{ matrix.erlang_version }}
           SECONDARY_UMBRELLA_GITREFS=v3.7.28 v3.8.9
-        tags: ghcr.io/cf-rabbitmq-core/ci-base:${{ matrix.erlang_version }}
+        tags: ghcr.io/rabbitmq/rabbitmq-server:actions-ci-base-${ matrix.erlang_version }
         cache-from: type=local,src=/tmp/.buildx-cache
         cache-to: type=local,dest=/tmp/.buildx-cache

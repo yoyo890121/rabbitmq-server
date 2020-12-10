@@ -4,6 +4,16 @@
 #@   return ",".join(['{0}={1}'.format(k,d[k]) for k in d.keys()])
 #@ end
 
+#@ def erlang_image_name():
+#@   workflow_images = data.values.workflow_images
+#@   return "{}/{}:actions-erlang-elixir-${{ matrix.erlang_version }}".format(workflow_images.registry, workflow_images.repository)
+#@ end
+
+#@ def base_image_name():
+#@   workflow_images = data.values.workflow_images
+#@   return "{}/{}:actions-ci-base-${{ matrix.erlang_version }}".format(workflow_images.registry, workflow_images.repository)
+#@ end
+
 ---
 name: Workflow Base Images
 #! https://github.com/k14s/ytt/issues/189
@@ -41,7 +51,7 @@ jobs:
         with:
           push: true
           file: ci/dockerfiles/${{ matrix.erlang_version }}/erlang_elixir
-          tags: ghcr.io/cf-rabbitmq-core/erlang_elixir:${{ matrix.erlang_version }}
+          tags: #@ erlang_image_name()
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
       - name: CREATE BASE CI IMAGE (${{ matrix.erlang_version }})
@@ -53,6 +63,6 @@ jobs:
           build-args: |
             ERLANG_VERSION=${{ matrix.erlang_version }}
             SECONDARY_UMBRELLA_GITREFS=(@= ' '.join(data.values.secondary_umbrella_gitrefs) @)
-          tags: ghcr.io/cf-rabbitmq-core/ci-base:${{ matrix.erlang_version }}
+          tags: #@ base_image_name()
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache

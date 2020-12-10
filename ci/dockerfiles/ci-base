@@ -1,6 +1,6 @@
 ARG ERLANG_VERSION
 
-FROM eu.gcr.io/cf-rabbitmq-core/erlang_elixir:${ERLANG_VERSION}
+FROM ghcr.io/rabbitmq/rabbitmq-server:actions-erlang-elixir-${ERLANG_VERSION}
 
 ENV ERLANG_VERSION=${ERLANG_VERSION}
 
