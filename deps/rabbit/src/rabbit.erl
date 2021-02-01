@@ -1123,7 +1123,7 @@ log_broker_started(Plugins) ->
 
 print_banner() ->
     Product = product_name(),
-    Version = product_version(),
+    Version = [product_version(), ", ", rabbit_misc:platform_and_version()],
     LineListFormatter = fun (Placeholder, [_ | Tail] = LL) ->
                               LF = lists:flatten([Placeholder || _ <- lists:seq(1, length(Tail))]),
                               {LF, LL};
