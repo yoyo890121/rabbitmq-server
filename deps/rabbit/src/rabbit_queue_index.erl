@@ -881,10 +881,10 @@ append_journal_to_segment(#segment { journal_entries = JEntries,
 
 get_journal_handle(State = #qistate { journal_handle = undefined,
                                       dir = Dir,
-                                      queue_name = Name }) ->
+                                      queue_name = _Name }) ->
     Path = filename:join(Dir, ?JOURNAL_FILENAME),
     ok = rabbit_file:ensure_dir(Path),
-    ok = ensure_queue_name_stub_file(Dir, Name),
+    %% ok = ensure_queue_name_stub_file(Dir, Name),
     {ok, Hdl} = file_handle_cache:open_with_absolute_path(
                   Path, ?WRITE_MODE, [{write_buffer, infinity}]),
     {Hdl, State #qistate { journal_handle = Hdl }};
@@ -1468,8 +1468,8 @@ move_to_per_vhost_stores(#resource{} = QueueName) ->
     case rabbit_file:is_dir(OldQueueDir) of
         true  ->
             ok = rabbit_file:ensure_dir(NewQueueDir),
-            ok = rabbit_file:rename(OldQueueDir, NewQueueDir),
-            ok = ensure_queue_name_stub_file(NewQueueDir, QueueName);
+            ok = rabbit_file:rename(OldQueueDir, NewQueueDir);
+            %% ok = ensure_queue_name_stub_file(NewQueueDir, QueueName);
         false ->
             Msg  = "Queue index directory '~s' not found for ~s~n",
             Args = [OldQueueDir, rabbit_misc:rs(QueueName)],
@@ -1478,10 +1478,18 @@ move_to_per_vhost_stores(#resource{} = QueueName) ->
     end,
     ok.
 
-ensure_queue_name_stub_file(Dir, #resource{virtual_host = VHost, name = QName}) ->
-    QueueNameFile = filename:join(Dir, ?QUEUE_NAME_STUB_FILE),
-    file:write_file(QueueNameFile, <<"VHOST: ", VHost/binary, "\n",
-                                     "QUEUE: ", QName/binary, "\n">>).
+%% TODO: We may want to write this file only once, on queue dir creation.
+%% We definitely do not want to write this on every publish.
+%% It will result in many GBs being written to disk, as caught by https://github.com/rabbitmq/rabbitmq-server/discussions/2785
+%% The simplest thing is to stop doing this, and see if it reduces not just disk writes, but also memory bloat.
+%% rabbit_prequeue process memory increases to 2MB when 20 messages each with a payload of 12bytes need to be written to disk.
+%% Even after we account the message metadata and count ~600bytes per message, there is something wrong if heap increases to 1MB for 1.2KB of total message data.
+%% That 1MB of heap memory translates into 2MB of process memory (that's how Erlang grows it).
+%% A memory overhead of 1706x - 2MB for 1.2KB - is an insane amount.
+%% ensure_queue_name_stub_file(Dir, #resource{virtual_host = VHost, name = QName}) ->
+%%     QueueNameFile = filename:join(Dir, ?QUEUE_NAME_STUB_FILE),
+%%     file:write_file(QueueNameFile, <<"VHOST: ", VHost/binary, "\n",
+%%                                      "QUEUE: ", QName/binary, "\n">>).
 
 read_global_recovery_terms(DurableQueueNames) ->
     ok = rabbit_recovery_terms:open_global_table(),
