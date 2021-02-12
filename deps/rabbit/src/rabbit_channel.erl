@@ -45,6 +45,7 @@
 -include_lib("rabbit_common/include/rabbit_misc.hrl").
 
 -include("amqqueue.hrl").
+-include_lib("opentelemetry_api/include/otel_meter.hrl").
 
 -behaviour(gen_server2).
 
@@ -215,6 +216,8 @@
 -define(INCR_STATS(Type, Key, Inc, Measure),
         begin
             rabbit_core_metrics:channel_stats(Type, Measure, {self(), Key}, Inc),
+            % rabbit_log:warning("NOT FINE~nType: ~p~nMeasure: ~p~nSelf: ~p~nKey: ~p~nInc: ~p~n", [Type, Measure, self(), Key, Inc]),
+            ?otel_counter_add(lists:concat([Type, "_", Measure, "_total"]), Inc),
             %% Keys in the process dictionary are used to clean up the core metrics
             put({Type, Key}, none)
         end).
