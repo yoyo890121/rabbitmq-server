@@ -9,17 +9,6 @@ runs-on: ubuntu-18.04
 if: #@ skip_ci_condition()
 #@yaml/text-templated-strings
 steps:
-  - name: RECORD STEP START
-    id: buildevents
-    run: |
-      echo "::set-output name=step_start::$(date +%s)"
-  - uses: actions/cache@v2
-    with:
-      key: #@ ci_image_tag(erlang_version)
-      path: ci.tar
-  - name: LOAD CI DOCKER IMAGE FROM CACHE
-    run: |
-      docker load --input ci.tar
   #@ if getattr(dep, 'use_terraform', False):
   - name: PREPARE TERRAFORM SECRETS
     run: |
@@ -29,17 +18,7 @@ steps:
   #@ end
   - name: RUN TESTS
     run: |
-      mkdir ct-logs && chmod 777 ct-logs
-      docker run \
-        --env project=(@= dep.name @) \
-        --env GITHUB_RUN_ID=${{ github.run_id }} \
-        --env BUILDEVENT_APIKEY=${{ secrets.HONEYCOMB_API_KEY }} \
-        --env STEP_START=${{ steps.buildevents.outputs.step_start }} \
-        (@= additional_docker_args(dep, erlang_version=erlang_version) @) \
-        --volume ${PWD}/ct-logs:/workspace/ct-logs \
-        --oom-kill-disable \
-        (@= ci_image(erlang_version) @) \
-        ci/scripts/tests.sh
+      make -C deps/(@= dep.name @) tests
   - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview

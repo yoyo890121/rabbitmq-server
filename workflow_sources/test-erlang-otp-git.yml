@@ -7,7 +7,7 @@
 
 #@ erlang_version = "git"
 
-#@ prepare = prepare_jobs(erlang_version=erlang_version, build_base_image=True)
+#@ prepare = prepare_jobs(erlang_version=erlang_version, build_erlang=True)
 #@ deps = [dep_jobs(dep, erlang_version=erlang_version) for dep in data.values.deps]
 #@ finish = finish_jobs([prepare[k]['name'] for k in prepare], erlang_version=erlang_version)
 
