@@ -19,10 +19,21 @@ steps:
   #@ if getattr(dep, 'use_terraform', False):
   - name: PREPARE TERRAFORM SECRETS
     run: |
-      mkdir terraform && chmod 777 terraform
-      echo "${{ secrets.TERRAFORM_SSH_KEY }}" > terraform/id_rsa_terraform
-      echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > terraform/id_rsa_terraform.pub
-  #@ end
+      echo "${{ secrets.TERRAFORM_SSH_KEY }}" > id_rsa_terraform
+      echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > id_rsa_terraform.pub
+  - name: RUN TESTS
+    run: |
+      make -C deps/(@= dep.name @) tests \
+        base_rmq_ref=(@= data.values.base_rmq_ref @) \
+        current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+        FULL= \
+        FAIL_FAST=1 \
+        SKIP_AS_ERROR=1 \
+        ERLANG_VERSION=(@= erlang_version @) \
+        AWS_ACCESS_KEY_ID=${{ secrets.CONCOURSE_AWS_ACCESS_KEY_ID }} \
+        AWS_SECRET_ACCESS_KEY=${{ secrets.CONCOURSE_AWS_SECRET_ACCESS_KEY }} \
+        SSH_KEY=$PWD/id_rsa_terraform
+  #@ else:
   - name: RUN TESTS
     run: |
       make -C deps/(@= dep.name @) tests \
@@ -31,6 +42,7 @@ steps:
         FULL= \
         FAIL_FAST=1 \
         SKIP_AS_ERROR=1
+  #@ end
   - name: ON FAILRUE ARCHIVE TESTS LOGS
     if: failure()
     run: |
@@ -42,18 +54,4 @@ steps:
     with:
       name: (@= dep.name @)-ct-logs
       path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
-#@ end
-
-#@ def additional_docker_args(dep, erlang_version=None):
-#@   if getattr(dep, 'use_terraform', False):
-#@     args = []
-#@     args.append("--env ERLANG_VERSION={}".format(erlang_version))
-#@     args.append("--env AWS_ACCESS_KEY_ID=${{ secrets.CONCOURSE_AWS_ACCESS_KEY_ID }}")
-#@     args.append("--env AWS_SECRET_ACCESS_KEY=${{ secrets.CONCOURSE_AWS_SECRET_ACCESS_KEY }}")
-#@     args.append("--env SSH_KEY=/workspace/terraform/id_rsa_terraform")
-#@     args.append("--volume ${PWD}/terraform:/workspace/terraform")
-#@     return " \\\n  ".join(args)
-#@   else:
-#@     return ""
-#@   end
 #@ end

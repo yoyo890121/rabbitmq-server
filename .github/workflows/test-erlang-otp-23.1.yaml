@@ -9183,9 +9183,8 @@ jobs:
         elixir-version: 1.10.4
     - name: PREPARE TERRAFORM SECRETS
       run: |
-        mkdir terraform && chmod 777 terraform
-        echo "${{ secrets.TERRAFORM_SSH_KEY }}" > terraform/id_rsa_terraform
-        echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > terraform/id_rsa_terraform.pub
+        echo "${{ secrets.TERRAFORM_SSH_KEY }}" > id_rsa_terraform
+        echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > id_rsa_terraform.pub
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_peer_discovery_aws tests \
@@ -9193,7 +9192,11 @@ jobs:
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
           FULL= \
           FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+          SKIP_AS_ERROR=1 \
+          ERLANG_VERSION=23.1 \
+          AWS_ACCESS_KEY_ID=${{ secrets.CONCOURSE_AWS_ACCESS_KEY_ID }} \
+          AWS_SECRET_ACCESS_KEY=${{ secrets.CONCOURSE_AWS_SECRET_ACCESS_KEY }} \
+          SSH_KEY=$PWD/id_rsa_terraform
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
