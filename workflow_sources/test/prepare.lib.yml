@@ -41,7 +41,7 @@ prepare:
     #@ end
     #@ if erlang_version != "git":
     - name: CACHE SECONDARY UMBRELLAS
-      uses: actions/cache@v1
+      uses: actions/cache@v2
       with:
         path: umbrellas
         key: #@ "secondary-umbrellas-{}-erlang-{}".format("-".join(data.values.secondary_umbrella_gitrefs), erlang_version)
@@ -56,16 +56,12 @@ prepare:
             rm -rf "$umbrella"
             # Fetch the master Umbrella; the final umbrellas are created from
             # the master copy.
-            if ! test -d umbrellas/master; then
-              git config --global advice.detachedHead false
-              git clone \
-                https://github.com/rabbitmq/rabbitmq-public-umbrella.git \
-                umbrellas/master
-              make -C umbrellas/master co # To get RabbitMQ components.
-            fi
-            # We copy the master Umbrella and checkout the appropriate tag.
-            cp -a umbrellas/master "$umbrella"
-            git -C "$umbrella" checkout "master"
+            git config --global advice.detachedHead false
+            git clone \
+              https://github.com/rabbitmq/rabbitmq-public-umbrella.git \
+              $umbrella
+            git -C "$umbrella" checkout "$version"
+            make -C $umbrella co # To get RabbitMQ components.
             make -C "$umbrella" up BRANCH="$version"
             # To remove third-party deps which were checked out when the
             # projects were on the `master` branch. Thus, possibly not the
@@ -79,7 +75,6 @@ prepare:
             rm -rf "$umbrella"/deps/*/{.git,test} "$umbrella"/.git
           fi
         done
-        rm -fr umbrellas/master
     - name: CREATE SECONDARY UMBRELLAS ARCHIVE
       run: |
         set -ex
