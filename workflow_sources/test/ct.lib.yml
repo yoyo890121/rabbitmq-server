@@ -19,6 +19,11 @@ steps:
     #@ None if is_unique(suite_names) else assert.fail('{} suite names are not unique'.format(dep.name))
     run: |
       ci/scripts/validate-workflow.sh (@= " ".join(suite_names) @)
+  - name: CONFIGURE OTP & ELIXIR
+    uses: actions/setup-elixir@v1
+    with:
+      otp-version: #@ erlang_version
+      elixir-version: #@ data.values.elixir_version
   - name: RUN EUNIT
     run: |
       make eunit \
