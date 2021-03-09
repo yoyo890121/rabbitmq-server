@@ -31,4 +31,8 @@ steps:
     with:
       name: (@= dep.name @)-broker-logs
       path: "broker-logs/broker-logs.tar.xz"
+  - name: STOP BACKGROUND BROKER
+    if: always()
+    run: |
+      make stop-node
 #@ end

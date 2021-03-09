@@ -8879,6 +8879,10 @@ jobs:
       with:
         name: rabbitmq_cli-broker-logs
         path: broker-logs/broker-logs.tar.xz
+    - name: STOP BACKGROUND BROKER
+      if: always()
+      run: |
+        make stop-node
   rabbitmq_consistent_hash_exchange:
     name: rabbitmq_consistent_hash_exchange
     needs:
