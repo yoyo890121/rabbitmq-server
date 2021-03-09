@@ -39,7 +39,6 @@ jobs:
             git clone \
               https://github.com/rabbitmq/rabbitmq-public-umbrella.git \
               $umbrella
-            git -C "$umbrella" checkout "$version"
             make -C $umbrella co # To get RabbitMQ components.
             make -C "$umbrella" up BRANCH="$version"
             # To remove third-party deps which were checked out when the
