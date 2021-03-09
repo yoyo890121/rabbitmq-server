@@ -38,8 +38,8 @@ jobs:
             git config --global advice.detachedHead false
             git clone \
               https://github.com/rabbitmq/rabbitmq-public-umbrella.git \
-              $umbrella
-            make -C $umbrella co # To get RabbitMQ components.
+              "$umbrella"
+            make -C "$umbrella" co BRANCH="$version"
             make -C "$umbrella" up BRANCH="$version"
             # To remove third-party deps which were checked out when the
             # projects were on the `master` branch. Thus, possibly not the
