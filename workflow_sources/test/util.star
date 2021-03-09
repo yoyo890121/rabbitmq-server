@@ -2,6 +2,10 @@ def is_unique(l):
   return len(l) == len(set(l))
 end
 
+def flatten(l):
+  return [item for sublist in l for item in sublist]
+end
+
 def merge(dicts):
   r = {}
   for d in dicts:

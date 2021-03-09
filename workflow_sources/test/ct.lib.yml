@@ -105,17 +105,3 @@ steps:
   #@ end
   #@ end
 #@ end
-
-#@ def collect_job(dep, erlang_version=None):
-name: #@ dep.name
-needs: #@ [dep.name + "-checks"] + [dep.name + "-ct-" + suite.name for suite in dep.suites]
-runs-on: ubuntu-18.04
-#! See https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#job-status-check-functions
-#! as to why '(success() || failure())' is needed
-if: #@ skip_ci_condition() + " && (success() || failure())"
-#@yaml/text-templated-strings
-steps:
-- name: #@ "FAN IN {} SUITES".format(dep.name)
-  run: |
-    echo "Success"
-#@ end

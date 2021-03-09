@@ -1,5 +1,6 @@
 #@ load("@ytt:data", "data")
 #@ load("helpers.star", "ci_image", "ci_image_tag", "skip_ci_condition")
+#@ load("util.star", "flatten")
 
 #@ def gcs_path():
 #@   c = ['monorepo_github_actions_conclusions']
@@ -8,10 +9,22 @@
 #@   return '/'.join(c)
 #@ end
 
+#@ def dep_jobs(dep):
+#@   if not getattr(dep, "skip_tests", False):
+#@     if getattr(dep, "test_suites_in_parallel", False):
+#@       return [dep.name + "-checks"] + [dep.name + "-ct-" + suite.name for suite in dep.suites]
+#@     else:
+#@       return [dep.name]
+#@     end
+#@   else:
+#@     return []
+#@   end
+#@ end
+
 #@ def finish_jobs(prepare_jobs_names, erlang_version=None):
 finish:
   name: finish
-  needs: #@ prepare_jobs_names + [dep.name for dep in data.values.deps if not getattr(dep, "skip_tests", False)]
+  needs: #@ flatten([prepare_jobs_names] + [dep_jobs(dep) for dep in data.values.deps])
   runs-on: ubuntu-18.04
   #! See https://docs.github.com/en/free-pro-team@latest/actions/reference/context-and-expression-syntax-for-github-actions#job-status-check-functions
   #! as to why '(success() || failure())' is needed
