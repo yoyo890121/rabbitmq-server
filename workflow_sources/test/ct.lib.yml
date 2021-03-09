@@ -19,6 +19,14 @@ steps:
     #@ None if is_unique(suite_names) else assert.fail('{} suite names are not unique'.format(dep.name))
     run: |
       ci/scripts/validate-workflow.sh (@= " ".join(suite_names) @)
+  - name: RUN EUNIT
+    run: |
+      make eunit \
+        base_rmq_ref=(@= data.values.base_rmq_ref @) \
+        current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+        FULL= \
+        FAIL_FAST=1 \
+        SKIP_AS_ERROR=1
 #@ end
 
 #@ def ct_suites_job(dep, suite_name, erlang_version=None):
@@ -40,23 +48,51 @@ steps:
   - name: #@ "RUN ct-" + suite_name
     id: tests
     run: |
-      make -C deps/(@= dep.name @) ct-(@= suite_name @)
+      make -C deps/(@= dep.name @) ct-(@= suite_name @) \
+        base_rmq_ref=(@= data.values.base_rmq_ref @) \
+        current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+        FULL= \
+        FAIL_FAST=1 \
+        SKIP_AS_ERROR=1
+  - name: ON FAILRUE ARCHIVE TESTS LOGS
+    if: failure() && steps.tests.outcome == 'failure'
+    run: |
+      make -C deps/(@= dep.name @) ct-logs-archive
   - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview
     if: failure() && steps.tests.outcome == 'failure'
     with:
       name: (@= dep.name @)-ct-(@= suite_name @)-logs
-      path: "ct-(@= suite_name @)-logs/*-ct-logs-*.tar.xz"
-  #@ if erlang_version == data.values.erlang_versions[0]:
+      path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
+  #@ if erlang_version != "git":
+  - name: DOWNLOAD SECONDARY UMBRELLAS ARCHIVE
+    uses: actions/download-artifact@v2
+    with:
+      name: secondary-umbrellas.tar.xz
+  - name: UNPACK SECONDARY UMBRELLAS ARCHIVE
+    run: |
+      set -ex
+      tar Jxf secondary-umbrellas.tar.xz
+      rm secondary-umbrellas.tar.xz
   #@ for version in data.values.secondary_umbrella_gitrefs:
   #@   logs_dir = 'ct-{}-logs-{}'.format(suite_name, version)
   #@   step_id = "tests-{}".format(version.replace(".","_"))
   - name: #@ "RUN ct-{} [mixed {}]".format(suite_name, version)
     id: #@ step_id
     run: |
-      make -C deps/(@= dep.name @) ct-(@= suite_name @) \
-        SECONDARY_UMBRELLA_VERSION=(@= version @)
+      make -C deps/(@= dep.name @) distclean-ct ct-(@= suite_name @) \
+        base_rmq_ref=(@= data.values.base_rmq_ref @) \
+        current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+        FULL= \
+        FAIL_FAST=1 \
+        SKIP_AS_ERROR=1
+        SECONDARY_UMBRELLA_VERSION=$PWD/umbrellas/(@= version @) \
+        RABBITMQ_FEATURE_FLAGS=
+  - name: #@ 'ON FAILURE ARCHIVE TESTS LOGS [mixed {}]'.format(version)
+    if: failure() && steps.tests.outcome == 'failure'
+    run: |
+      make -C deps/(@= dep.name @) ct-logs-archive
   - name: #@ 'ON FAILURE UPLOAD TESTS LOGS ARTIFACT [mixed {}]'.format(version)
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview
@@ -65,7 +101,7 @@ steps:
     if: failure() && steps.(@= step_id @).outcome == 'failure'
     with:
       name: (@= dep.name @)-ct-(@= suite_name @)-logs-mixed-(@= version @)
-      path: "(@= logs_dir @)/*-ct-logs-*.tar.xz"
+      path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
   #@ end
   #@ end
 #@ end

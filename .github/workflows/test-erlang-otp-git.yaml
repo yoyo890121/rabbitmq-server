@@ -287,13 +287,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbit_common tests
+        make -C deps/rabbit_common tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbit_common ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbit_common-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit_common/*-ct-logs-*.tar.xz
   rabbit-checks:
     name: rabbit-checks
     needs:
@@ -308,6 +317,14 @@ jobs:
         project: rabbit
       run: |
         ci/scripts/validate-workflow.sh amqqueue_backward_compatibility backing_queue channel_interceptor channel_operation_timeout cluster cluster_rename clustering_management config_schema confirms_rejects consumer_timeout crashing_queues dead_lettering definition_import disconnect_detected_during_alarm dynamic_ha dynamic_qq eager_sync feature_flags lazy_queue list_consumers_sanity_check list_queues_online_and_offline maintenance_mode many_node_ha message_size_limit metrics mirrored_supervisor msg_store peer_discovery_classic_config peer_discovery_dns per_user_connection_channel_limit per_user_connection_channel_limit_partitions per_user_connection_channel_tracking per_user_connection_tracking per_vhost_connection_limit per_vhost_connection_limit_partitions per_vhost_msg_store per_vhost_queue_limit policy priority_queue priority_queue_recovery product_info proxy_protocol publisher_confirms_parallel queue_length_limits queue_master_location queue_parallel queue_type quorum_queue rabbit_confirms rabbit_core_metrics_gc rabbit_fifo rabbit_fifo_int rabbit_fifo_prop rabbit_fifo_v0 rabbit_msg_record rabbit_stream_queue rabbitmq_queues_cli_integration rabbitmqctl_integration rabbitmqctl_shutdown signal_handling simple_ha single_active_consumer sync_detection term_to_binary_compat_prop topic_permission unit_access_control unit_access_control_authn_authz_context_propagation unit_access_control_credential_validation unit_amqp091_content_framing unit_amqp091_server_properties unit_app_management unit_cluster_formation_locking_mocks unit_collections unit_config_value_encryption unit_connection_tracking unit_credit_flow unit_disk_monitor unit_disk_monitor_mocks unit_file_handle_cache unit_gen_server2 unit_gm unit_log_config unit_log_management unit_operator_policy unit_pg_local unit_plugin_directories unit_plugin_versioning unit_policy_validators unit_priority_queue unit_queue_consumers unit_stats_and_metrics unit_supervisor2 unit_vm_memory_monitor upgrade_preparation vhost
+    - name: RUN EUNIT
+      run: |
+        make eunit \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
   rabbit-ct-amqqueue_backward_compatibility:
     name: rabbit-ct-amqqueue_backward_compatibility
     needs:
@@ -326,13 +343,22 @@ jobs:
     - name: RUN ct-amqqueue_backward_compatibility
       id: tests
       run: |
-        make -C deps/rabbit ct-amqqueue_backward_compatibility
+        make -C deps/rabbit ct-amqqueue_backward_compatibility \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-amqqueue_backward_compatibility-logs
-        path: ct-amqqueue_backward_compatibility-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-backing_queue:
     name: rabbit-ct-backing_queue
     needs:
@@ -351,13 +377,22 @@ jobs:
     - name: RUN ct-backing_queue
       id: tests
       run: |
-        make -C deps/rabbit ct-backing_queue
+        make -C deps/rabbit ct-backing_queue \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-backing_queue-logs
-        path: ct-backing_queue-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-channel_interceptor:
     name: rabbit-ct-channel_interceptor
     needs:
@@ -376,13 +411,22 @@ jobs:
     - name: RUN ct-channel_interceptor
       id: tests
       run: |
-        make -C deps/rabbit ct-channel_interceptor
+        make -C deps/rabbit ct-channel_interceptor \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-channel_interceptor-logs
-        path: ct-channel_interceptor-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-channel_operation_timeout:
     name: rabbit-ct-channel_operation_timeout
     needs:
@@ -401,13 +445,22 @@ jobs:
     - name: RUN ct-channel_operation_timeout
       id: tests
       run: |
-        make -C deps/rabbit ct-channel_operation_timeout
+        make -C deps/rabbit ct-channel_operation_timeout \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-channel_operation_timeout-logs
-        path: ct-channel_operation_timeout-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-cluster:
     name: rabbit-ct-cluster
     needs:
@@ -426,13 +479,22 @@ jobs:
     - name: RUN ct-cluster
       id: tests
       run: |
-        make -C deps/rabbit ct-cluster
+        make -C deps/rabbit ct-cluster \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-cluster-logs
-        path: ct-cluster-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-cluster_rename:
     name: rabbit-ct-cluster_rename
     needs:
@@ -451,13 +513,22 @@ jobs:
     - name: RUN ct-cluster_rename
       id: tests
       run: |
-        make -C deps/rabbit ct-cluster_rename
+        make -C deps/rabbit ct-cluster_rename \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-cluster_rename-logs
-        path: ct-cluster_rename-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-clustering_management:
     name: rabbit-ct-clustering_management
     needs:
@@ -476,13 +547,22 @@ jobs:
     - name: RUN ct-clustering_management
       id: tests
       run: |
-        make -C deps/rabbit ct-clustering_management
+        make -C deps/rabbit ct-clustering_management \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-clustering_management-logs
-        path: ct-clustering_management-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-config_schema:
     name: rabbit-ct-config_schema
     needs:
@@ -501,13 +581,22 @@ jobs:
     - name: RUN ct-config_schema
       id: tests
       run: |
-        make -C deps/rabbit ct-config_schema
+        make -C deps/rabbit ct-config_schema \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-config_schema-logs
-        path: ct-config_schema-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-confirms_rejects:
     name: rabbit-ct-confirms_rejects
     needs:
@@ -526,13 +615,22 @@ jobs:
     - name: RUN ct-confirms_rejects
       id: tests
       run: |
-        make -C deps/rabbit ct-confirms_rejects
+        make -C deps/rabbit ct-confirms_rejects \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-confirms_rejects-logs
-        path: ct-confirms_rejects-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-consumer_timeout:
     name: rabbit-ct-consumer_timeout
     needs:
@@ -551,13 +649,22 @@ jobs:
     - name: RUN ct-consumer_timeout
       id: tests
       run: |
-        make -C deps/rabbit ct-consumer_timeout
+        make -C deps/rabbit ct-consumer_timeout \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-consumer_timeout-logs
-        path: ct-consumer_timeout-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-crashing_queues:
     name: rabbit-ct-crashing_queues
     needs:
@@ -576,13 +683,22 @@ jobs:
     - name: RUN ct-crashing_queues
       id: tests
       run: |
-        make -C deps/rabbit ct-crashing_queues
+        make -C deps/rabbit ct-crashing_queues \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-crashing_queues-logs
-        path: ct-crashing_queues-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-dead_lettering:
     name: rabbit-ct-dead_lettering
     needs:
@@ -601,13 +717,22 @@ jobs:
     - name: RUN ct-dead_lettering
       id: tests
       run: |
-        make -C deps/rabbit ct-dead_lettering
+        make -C deps/rabbit ct-dead_lettering \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-dead_lettering-logs
-        path: ct-dead_lettering-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-definition_import:
     name: rabbit-ct-definition_import
     needs:
@@ -626,13 +751,22 @@ jobs:
     - name: RUN ct-definition_import
       id: tests
       run: |
-        make -C deps/rabbit ct-definition_import
+        make -C deps/rabbit ct-definition_import \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-definition_import-logs
-        path: ct-definition_import-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-disconnect_detected_during_alarm:
     name: rabbit-ct-disconnect_detected_during_alarm
     needs:
@@ -651,13 +785,22 @@ jobs:
     - name: RUN ct-disconnect_detected_during_alarm
       id: tests
       run: |
-        make -C deps/rabbit ct-disconnect_detected_during_alarm
+        make -C deps/rabbit ct-disconnect_detected_during_alarm \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-disconnect_detected_during_alarm-logs
-        path: ct-disconnect_detected_during_alarm-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-dynamic_ha:
     name: rabbit-ct-dynamic_ha
     needs:
@@ -676,13 +819,22 @@ jobs:
     - name: RUN ct-dynamic_ha
       id: tests
       run: |
-        make -C deps/rabbit ct-dynamic_ha
+        make -C deps/rabbit ct-dynamic_ha \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-dynamic_ha-logs
-        path: ct-dynamic_ha-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-dynamic_qq:
     name: rabbit-ct-dynamic_qq
     needs:
@@ -701,13 +853,22 @@ jobs:
     - name: RUN ct-dynamic_qq
       id: tests
       run: |
-        make -C deps/rabbit ct-dynamic_qq
+        make -C deps/rabbit ct-dynamic_qq \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-dynamic_qq-logs
-        path: ct-dynamic_qq-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-eager_sync:
     name: rabbit-ct-eager_sync
     needs:
@@ -726,13 +887,22 @@ jobs:
     - name: RUN ct-eager_sync
       id: tests
       run: |
-        make -C deps/rabbit ct-eager_sync
+        make -C deps/rabbit ct-eager_sync \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-eager_sync-logs
-        path: ct-eager_sync-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-feature_flags:
     name: rabbit-ct-feature_flags
     needs:
@@ -751,13 +921,22 @@ jobs:
     - name: RUN ct-feature_flags
       id: tests
       run: |
-        make -C deps/rabbit ct-feature_flags
+        make -C deps/rabbit ct-feature_flags \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-feature_flags-logs
-        path: ct-feature_flags-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-lazy_queue:
     name: rabbit-ct-lazy_queue
     needs:
@@ -776,13 +955,22 @@ jobs:
     - name: RUN ct-lazy_queue
       id: tests
       run: |
-        make -C deps/rabbit ct-lazy_queue
+        make -C deps/rabbit ct-lazy_queue \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-lazy_queue-logs
-        path: ct-lazy_queue-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-list_consumers_sanity_check:
     name: rabbit-ct-list_consumers_sanity_check
     needs:
@@ -801,13 +989,22 @@ jobs:
     - name: RUN ct-list_consumers_sanity_check
       id: tests
       run: |
-        make -C deps/rabbit ct-list_consumers_sanity_check
+        make -C deps/rabbit ct-list_consumers_sanity_check \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-list_consumers_sanity_check-logs
-        path: ct-list_consumers_sanity_check-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-list_queues_online_and_offline:
     name: rabbit-ct-list_queues_online_and_offline
     needs:
@@ -826,13 +1023,22 @@ jobs:
     - name: RUN ct-list_queues_online_and_offline
       id: tests
       run: |
-        make -C deps/rabbit ct-list_queues_online_and_offline
+        make -C deps/rabbit ct-list_queues_online_and_offline \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-list_queues_online_and_offline-logs
-        path: ct-list_queues_online_and_offline-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-maintenance_mode:
     name: rabbit-ct-maintenance_mode
     needs:
@@ -851,13 +1057,22 @@ jobs:
     - name: RUN ct-maintenance_mode
       id: tests
       run: |
-        make -C deps/rabbit ct-maintenance_mode
+        make -C deps/rabbit ct-maintenance_mode \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-maintenance_mode-logs
-        path: ct-maintenance_mode-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-many_node_ha:
     name: rabbit-ct-many_node_ha
     needs:
@@ -876,13 +1091,22 @@ jobs:
     - name: RUN ct-many_node_ha
       id: tests
       run: |
-        make -C deps/rabbit ct-many_node_ha
+        make -C deps/rabbit ct-many_node_ha \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-many_node_ha-logs
-        path: ct-many_node_ha-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-message_size_limit:
     name: rabbit-ct-message_size_limit
     needs:
@@ -901,13 +1125,22 @@ jobs:
     - name: RUN ct-message_size_limit
       id: tests
       run: |
-        make -C deps/rabbit ct-message_size_limit
+        make -C deps/rabbit ct-message_size_limit \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-message_size_limit-logs
-        path: ct-message_size_limit-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-metrics:
     name: rabbit-ct-metrics
     needs:
@@ -926,13 +1159,22 @@ jobs:
     - name: RUN ct-metrics
       id: tests
       run: |
-        make -C deps/rabbit ct-metrics
+        make -C deps/rabbit ct-metrics \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-metrics-logs
-        path: ct-metrics-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-mirrored_supervisor:
     name: rabbit-ct-mirrored_supervisor
     needs:
@@ -951,13 +1193,22 @@ jobs:
     - name: RUN ct-mirrored_supervisor
       id: tests
       run: |
-        make -C deps/rabbit ct-mirrored_supervisor
+        make -C deps/rabbit ct-mirrored_supervisor \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-mirrored_supervisor-logs
-        path: ct-mirrored_supervisor-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-msg_store:
     name: rabbit-ct-msg_store
     needs:
@@ -976,13 +1227,22 @@ jobs:
     - name: RUN ct-msg_store
       id: tests
       run: |
-        make -C deps/rabbit ct-msg_store
+        make -C deps/rabbit ct-msg_store \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-msg_store-logs
-        path: ct-msg_store-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-peer_discovery_classic_config:
     name: rabbit-ct-peer_discovery_classic_config
     needs:
@@ -1001,13 +1261,22 @@ jobs:
     - name: RUN ct-peer_discovery_classic_config
       id: tests
       run: |
-        make -C deps/rabbit ct-peer_discovery_classic_config
+        make -C deps/rabbit ct-peer_discovery_classic_config \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-peer_discovery_classic_config-logs
-        path: ct-peer_discovery_classic_config-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-peer_discovery_dns:
     name: rabbit-ct-peer_discovery_dns
     needs:
@@ -1026,13 +1295,22 @@ jobs:
     - name: RUN ct-peer_discovery_dns
       id: tests
       run: |
-        make -C deps/rabbit ct-peer_discovery_dns
+        make -C deps/rabbit ct-peer_discovery_dns \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-peer_discovery_dns-logs
-        path: ct-peer_discovery_dns-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_user_connection_channel_limit:
     name: rabbit-ct-per_user_connection_channel_limit
     needs:
@@ -1051,13 +1329,22 @@ jobs:
     - name: RUN ct-per_user_connection_channel_limit
       id: tests
       run: |
-        make -C deps/rabbit ct-per_user_connection_channel_limit
+        make -C deps/rabbit ct-per_user_connection_channel_limit \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_user_connection_channel_limit-logs
-        path: ct-per_user_connection_channel_limit-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_user_connection_channel_limit_partitions:
     name: rabbit-ct-per_user_connection_channel_limit_partitions
     needs:
@@ -1076,13 +1363,22 @@ jobs:
     - name: RUN ct-per_user_connection_channel_limit_partitions
       id: tests
       run: |
-        make -C deps/rabbit ct-per_user_connection_channel_limit_partitions
+        make -C deps/rabbit ct-per_user_connection_channel_limit_partitions \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_user_connection_channel_limit_partitions-logs
-        path: ct-per_user_connection_channel_limit_partitions-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_user_connection_channel_tracking:
     name: rabbit-ct-per_user_connection_channel_tracking
     needs:
@@ -1101,13 +1397,22 @@ jobs:
     - name: RUN ct-per_user_connection_channel_tracking
       id: tests
       run: |
-        make -C deps/rabbit ct-per_user_connection_channel_tracking
+        make -C deps/rabbit ct-per_user_connection_channel_tracking \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_user_connection_channel_tracking-logs
-        path: ct-per_user_connection_channel_tracking-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_user_connection_tracking:
     name: rabbit-ct-per_user_connection_tracking
     needs:
@@ -1126,13 +1431,22 @@ jobs:
     - name: RUN ct-per_user_connection_tracking
       id: tests
       run: |
-        make -C deps/rabbit ct-per_user_connection_tracking
+        make -C deps/rabbit ct-per_user_connection_tracking \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_user_connection_tracking-logs
-        path: ct-per_user_connection_tracking-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_vhost_connection_limit:
     name: rabbit-ct-per_vhost_connection_limit
     needs:
@@ -1151,13 +1465,22 @@ jobs:
     - name: RUN ct-per_vhost_connection_limit
       id: tests
       run: |
-        make -C deps/rabbit ct-per_vhost_connection_limit
+        make -C deps/rabbit ct-per_vhost_connection_limit \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_vhost_connection_limit-logs
-        path: ct-per_vhost_connection_limit-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_vhost_connection_limit_partitions:
     name: rabbit-ct-per_vhost_connection_limit_partitions
     needs:
@@ -1176,13 +1499,22 @@ jobs:
     - name: RUN ct-per_vhost_connection_limit_partitions
       id: tests
       run: |
-        make -C deps/rabbit ct-per_vhost_connection_limit_partitions
+        make -C deps/rabbit ct-per_vhost_connection_limit_partitions \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_vhost_connection_limit_partitions-logs
-        path: ct-per_vhost_connection_limit_partitions-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_vhost_msg_store:
     name: rabbit-ct-per_vhost_msg_store
     needs:
@@ -1201,13 +1533,22 @@ jobs:
     - name: RUN ct-per_vhost_msg_store
       id: tests
       run: |
-        make -C deps/rabbit ct-per_vhost_msg_store
+        make -C deps/rabbit ct-per_vhost_msg_store \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_vhost_msg_store-logs
-        path: ct-per_vhost_msg_store-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-per_vhost_queue_limit:
     name: rabbit-ct-per_vhost_queue_limit
     needs:
@@ -1226,13 +1567,22 @@ jobs:
     - name: RUN ct-per_vhost_queue_limit
       id: tests
       run: |
-        make -C deps/rabbit ct-per_vhost_queue_limit
+        make -C deps/rabbit ct-per_vhost_queue_limit \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-per_vhost_queue_limit-logs
-        path: ct-per_vhost_queue_limit-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-policy:
     name: rabbit-ct-policy
     needs:
@@ -1251,13 +1601,22 @@ jobs:
     - name: RUN ct-policy
       id: tests
       run: |
-        make -C deps/rabbit ct-policy
+        make -C deps/rabbit ct-policy \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-policy-logs
-        path: ct-policy-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-priority_queue:
     name: rabbit-ct-priority_queue
     needs:
@@ -1276,13 +1635,22 @@ jobs:
     - name: RUN ct-priority_queue
       id: tests
       run: |
-        make -C deps/rabbit ct-priority_queue
+        make -C deps/rabbit ct-priority_queue \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-priority_queue-logs
-        path: ct-priority_queue-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-priority_queue_recovery:
     name: rabbit-ct-priority_queue_recovery
     needs:
@@ -1301,13 +1669,22 @@ jobs:
     - name: RUN ct-priority_queue_recovery
       id: tests
       run: |
-        make -C deps/rabbit ct-priority_queue_recovery
+        make -C deps/rabbit ct-priority_queue_recovery \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-priority_queue_recovery-logs
-        path: ct-priority_queue_recovery-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-product_info:
     name: rabbit-ct-product_info
     needs:
@@ -1326,13 +1703,22 @@ jobs:
     - name: RUN ct-product_info
       id: tests
       run: |
-        make -C deps/rabbit ct-product_info
+        make -C deps/rabbit ct-product_info \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-product_info-logs
-        path: ct-product_info-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-proxy_protocol:
     name: rabbit-ct-proxy_protocol
     needs:
@@ -1351,13 +1737,22 @@ jobs:
     - name: RUN ct-proxy_protocol
       id: tests
       run: |
-        make -C deps/rabbit ct-proxy_protocol
+        make -C deps/rabbit ct-proxy_protocol \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-proxy_protocol-logs
-        path: ct-proxy_protocol-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-publisher_confirms_parallel:
     name: rabbit-ct-publisher_confirms_parallel
     needs:
@@ -1376,13 +1771,22 @@ jobs:
     - name: RUN ct-publisher_confirms_parallel
       id: tests
       run: |
-        make -C deps/rabbit ct-publisher_confirms_parallel
+        make -C deps/rabbit ct-publisher_confirms_parallel \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-publisher_confirms_parallel-logs
-        path: ct-publisher_confirms_parallel-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-queue_length_limits:
     name: rabbit-ct-queue_length_limits
     needs:
@@ -1401,13 +1805,22 @@ jobs:
     - name: RUN ct-queue_length_limits
       id: tests
       run: |
-        make -C deps/rabbit ct-queue_length_limits
+        make -C deps/rabbit ct-queue_length_limits \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-queue_length_limits-logs
-        path: ct-queue_length_limits-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-queue_master_location:
     name: rabbit-ct-queue_master_location
     needs:
@@ -1426,13 +1839,22 @@ jobs:
     - name: RUN ct-queue_master_location
       id: tests
       run: |
-        make -C deps/rabbit ct-queue_master_location
+        make -C deps/rabbit ct-queue_master_location \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-queue_master_location-logs
-        path: ct-queue_master_location-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-queue_parallel:
     name: rabbit-ct-queue_parallel
     needs:
@@ -1451,13 +1873,22 @@ jobs:
     - name: RUN ct-queue_parallel
       id: tests
       run: |
-        make -C deps/rabbit ct-queue_parallel
+        make -C deps/rabbit ct-queue_parallel \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-queue_parallel-logs
-        path: ct-queue_parallel-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-queue_type:
     name: rabbit-ct-queue_type
     needs:
@@ -1476,13 +1907,22 @@ jobs:
     - name: RUN ct-queue_type
       id: tests
       run: |
-        make -C deps/rabbit ct-queue_type
+        make -C deps/rabbit ct-queue_type \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-queue_type-logs
-        path: ct-queue_type-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-quorum_queue:
     name: rabbit-ct-quorum_queue
     needs:
@@ -1501,13 +1941,22 @@ jobs:
     - name: RUN ct-quorum_queue
       id: tests
       run: |
-        make -C deps/rabbit ct-quorum_queue
+        make -C deps/rabbit ct-quorum_queue \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-quorum_queue-logs
-        path: ct-quorum_queue-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_confirms:
     name: rabbit-ct-rabbit_confirms
     needs:
@@ -1526,13 +1975,22 @@ jobs:
     - name: RUN ct-rabbit_confirms
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_confirms
+        make -C deps/rabbit ct-rabbit_confirms \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_confirms-logs
-        path: ct-rabbit_confirms-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_core_metrics_gc:
     name: rabbit-ct-rabbit_core_metrics_gc
     needs:
@@ -1551,13 +2009,22 @@ jobs:
     - name: RUN ct-rabbit_core_metrics_gc
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_core_metrics_gc
+        make -C deps/rabbit ct-rabbit_core_metrics_gc \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_core_metrics_gc-logs
-        path: ct-rabbit_core_metrics_gc-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_fifo:
     name: rabbit-ct-rabbit_fifo
     needs:
@@ -1576,13 +2043,22 @@ jobs:
     - name: RUN ct-rabbit_fifo
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_fifo
+        make -C deps/rabbit ct-rabbit_fifo \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_fifo-logs
-        path: ct-rabbit_fifo-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_fifo_int:
     name: rabbit-ct-rabbit_fifo_int
     needs:
@@ -1601,13 +2077,22 @@ jobs:
     - name: RUN ct-rabbit_fifo_int
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_fifo_int
+        make -C deps/rabbit ct-rabbit_fifo_int \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_fifo_int-logs
-        path: ct-rabbit_fifo_int-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_fifo_prop:
     name: rabbit-ct-rabbit_fifo_prop
     needs:
@@ -1626,13 +2111,22 @@ jobs:
     - name: RUN ct-rabbit_fifo_prop
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_fifo_prop
+        make -C deps/rabbit ct-rabbit_fifo_prop \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_fifo_prop-logs
-        path: ct-rabbit_fifo_prop-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_fifo_v0:
     name: rabbit-ct-rabbit_fifo_v0
     needs:
@@ -1651,13 +2145,22 @@ jobs:
     - name: RUN ct-rabbit_fifo_v0
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_fifo_v0
+        make -C deps/rabbit ct-rabbit_fifo_v0 \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_fifo_v0-logs
-        path: ct-rabbit_fifo_v0-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_msg_record:
     name: rabbit-ct-rabbit_msg_record
     needs:
@@ -1676,13 +2179,22 @@ jobs:
     - name: RUN ct-rabbit_msg_record
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_msg_record
+        make -C deps/rabbit ct-rabbit_msg_record \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_msg_record-logs
-        path: ct-rabbit_msg_record-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbit_stream_queue:
     name: rabbit-ct-rabbit_stream_queue
     needs:
@@ -1701,13 +2213,22 @@ jobs:
     - name: RUN ct-rabbit_stream_queue
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbit_stream_queue
+        make -C deps/rabbit ct-rabbit_stream_queue \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbit_stream_queue-logs
-        path: ct-rabbit_stream_queue-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbitmq_queues_cli_integration:
     name: rabbit-ct-rabbitmq_queues_cli_integration
     needs:
@@ -1726,13 +2247,22 @@ jobs:
     - name: RUN ct-rabbitmq_queues_cli_integration
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbitmq_queues_cli_integration
+        make -C deps/rabbit ct-rabbitmq_queues_cli_integration \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbitmq_queues_cli_integration-logs
-        path: ct-rabbitmq_queues_cli_integration-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbitmqctl_integration:
     name: rabbit-ct-rabbitmqctl_integration
     needs:
@@ -1751,13 +2281,22 @@ jobs:
     - name: RUN ct-rabbitmqctl_integration
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbitmqctl_integration
+        make -C deps/rabbit ct-rabbitmqctl_integration \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbitmqctl_integration-logs
-        path: ct-rabbitmqctl_integration-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-rabbitmqctl_shutdown:
     name: rabbit-ct-rabbitmqctl_shutdown
     needs:
@@ -1776,13 +2315,22 @@ jobs:
     - name: RUN ct-rabbitmqctl_shutdown
       id: tests
       run: |
-        make -C deps/rabbit ct-rabbitmqctl_shutdown
+        make -C deps/rabbit ct-rabbitmqctl_shutdown \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-rabbitmqctl_shutdown-logs
-        path: ct-rabbitmqctl_shutdown-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-signal_handling:
     name: rabbit-ct-signal_handling
     needs:
@@ -1801,13 +2349,22 @@ jobs:
     - name: RUN ct-signal_handling
       id: tests
       run: |
-        make -C deps/rabbit ct-signal_handling
+        make -C deps/rabbit ct-signal_handling \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-signal_handling-logs
-        path: ct-signal_handling-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-simple_ha:
     name: rabbit-ct-simple_ha
     needs:
@@ -1826,13 +2383,22 @@ jobs:
     - name: RUN ct-simple_ha
       id: tests
       run: |
-        make -C deps/rabbit ct-simple_ha
+        make -C deps/rabbit ct-simple_ha \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-simple_ha-logs
-        path: ct-simple_ha-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-single_active_consumer:
     name: rabbit-ct-single_active_consumer
     needs:
@@ -1851,13 +2417,22 @@ jobs:
     - name: RUN ct-single_active_consumer
       id: tests
       run: |
-        make -C deps/rabbit ct-single_active_consumer
+        make -C deps/rabbit ct-single_active_consumer \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-single_active_consumer-logs
-        path: ct-single_active_consumer-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-sync_detection:
     name: rabbit-ct-sync_detection
     needs:
@@ -1876,13 +2451,22 @@ jobs:
     - name: RUN ct-sync_detection
       id: tests
       run: |
-        make -C deps/rabbit ct-sync_detection
+        make -C deps/rabbit ct-sync_detection \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-sync_detection-logs
-        path: ct-sync_detection-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-term_to_binary_compat_prop:
     name: rabbit-ct-term_to_binary_compat_prop
     needs:
@@ -1901,13 +2485,22 @@ jobs:
     - name: RUN ct-term_to_binary_compat_prop
       id: tests
       run: |
-        make -C deps/rabbit ct-term_to_binary_compat_prop
+        make -C deps/rabbit ct-term_to_binary_compat_prop \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-term_to_binary_compat_prop-logs
-        path: ct-term_to_binary_compat_prop-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-topic_permission:
     name: rabbit-ct-topic_permission
     needs:
@@ -1926,13 +2519,22 @@ jobs:
     - name: RUN ct-topic_permission
       id: tests
       run: |
-        make -C deps/rabbit ct-topic_permission
+        make -C deps/rabbit ct-topic_permission \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-topic_permission-logs
-        path: ct-topic_permission-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_access_control:
     name: rabbit-ct-unit_access_control
     needs:
@@ -1951,13 +2553,22 @@ jobs:
     - name: RUN ct-unit_access_control
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_access_control
+        make -C deps/rabbit ct-unit_access_control \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_access_control-logs
-        path: ct-unit_access_control-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_access_control_authn_authz_context_propagation:
     name: rabbit-ct-unit_access_control_authn_authz_context_propagation
     needs:
@@ -1976,13 +2587,22 @@ jobs:
     - name: RUN ct-unit_access_control_authn_authz_context_propagation
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_access_control_authn_authz_context_propagation
+        make -C deps/rabbit ct-unit_access_control_authn_authz_context_propagation \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_access_control_authn_authz_context_propagation-logs
-        path: ct-unit_access_control_authn_authz_context_propagation-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_access_control_credential_validation:
     name: rabbit-ct-unit_access_control_credential_validation
     needs:
@@ -2001,13 +2621,22 @@ jobs:
     - name: RUN ct-unit_access_control_credential_validation
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_access_control_credential_validation
+        make -C deps/rabbit ct-unit_access_control_credential_validation \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_access_control_credential_validation-logs
-        path: ct-unit_access_control_credential_validation-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_amqp091_content_framing:
     name: rabbit-ct-unit_amqp091_content_framing
     needs:
@@ -2026,13 +2655,22 @@ jobs:
     - name: RUN ct-unit_amqp091_content_framing
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_amqp091_content_framing
+        make -C deps/rabbit ct-unit_amqp091_content_framing \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_amqp091_content_framing-logs
-        path: ct-unit_amqp091_content_framing-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_amqp091_server_properties:
     name: rabbit-ct-unit_amqp091_server_properties
     needs:
@@ -2051,13 +2689,22 @@ jobs:
     - name: RUN ct-unit_amqp091_server_properties
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_amqp091_server_properties
+        make -C deps/rabbit ct-unit_amqp091_server_properties \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_amqp091_server_properties-logs
-        path: ct-unit_amqp091_server_properties-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_app_management:
     name: rabbit-ct-unit_app_management
     needs:
@@ -2076,13 +2723,22 @@ jobs:
     - name: RUN ct-unit_app_management
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_app_management
+        make -C deps/rabbit ct-unit_app_management \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_app_management-logs
-        path: ct-unit_app_management-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_cluster_formation_locking_mocks:
     name: rabbit-ct-unit_cluster_formation_locking_mocks
     needs:
@@ -2101,13 +2757,22 @@ jobs:
     - name: RUN ct-unit_cluster_formation_locking_mocks
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_cluster_formation_locking_mocks
+        make -C deps/rabbit ct-unit_cluster_formation_locking_mocks \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_cluster_formation_locking_mocks-logs
-        path: ct-unit_cluster_formation_locking_mocks-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_collections:
     name: rabbit-ct-unit_collections
     needs:
@@ -2126,13 +2791,22 @@ jobs:
     - name: RUN ct-unit_collections
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_collections
+        make -C deps/rabbit ct-unit_collections \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_collections-logs
-        path: ct-unit_collections-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_config_value_encryption:
     name: rabbit-ct-unit_config_value_encryption
     needs:
@@ -2151,13 +2825,22 @@ jobs:
     - name: RUN ct-unit_config_value_encryption
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_config_value_encryption
+        make -C deps/rabbit ct-unit_config_value_encryption \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_config_value_encryption-logs
-        path: ct-unit_config_value_encryption-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_connection_tracking:
     name: rabbit-ct-unit_connection_tracking
     needs:
@@ -2176,13 +2859,22 @@ jobs:
     - name: RUN ct-unit_connection_tracking
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_connection_tracking
+        make -C deps/rabbit ct-unit_connection_tracking \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_connection_tracking-logs
-        path: ct-unit_connection_tracking-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_credit_flow:
     name: rabbit-ct-unit_credit_flow
     needs:
@@ -2201,13 +2893,22 @@ jobs:
     - name: RUN ct-unit_credit_flow
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_credit_flow
+        make -C deps/rabbit ct-unit_credit_flow \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_credit_flow-logs
-        path: ct-unit_credit_flow-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_disk_monitor:
     name: rabbit-ct-unit_disk_monitor
     needs:
@@ -2226,13 +2927,22 @@ jobs:
     - name: RUN ct-unit_disk_monitor
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_disk_monitor
+        make -C deps/rabbit ct-unit_disk_monitor \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_disk_monitor-logs
-        path: ct-unit_disk_monitor-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_disk_monitor_mocks:
     name: rabbit-ct-unit_disk_monitor_mocks
     needs:
@@ -2251,13 +2961,22 @@ jobs:
     - name: RUN ct-unit_disk_monitor_mocks
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_disk_monitor_mocks
+        make -C deps/rabbit ct-unit_disk_monitor_mocks \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_disk_monitor_mocks-logs
-        path: ct-unit_disk_monitor_mocks-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_file_handle_cache:
     name: rabbit-ct-unit_file_handle_cache
     needs:
@@ -2276,13 +2995,22 @@ jobs:
     - name: RUN ct-unit_file_handle_cache
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_file_handle_cache
+        make -C deps/rabbit ct-unit_file_handle_cache \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_file_handle_cache-logs
-        path: ct-unit_file_handle_cache-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_gen_server2:
     name: rabbit-ct-unit_gen_server2
     needs:
@@ -2301,13 +3029,22 @@ jobs:
     - name: RUN ct-unit_gen_server2
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_gen_server2
+        make -C deps/rabbit ct-unit_gen_server2 \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_gen_server2-logs
-        path: ct-unit_gen_server2-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_gm:
     name: rabbit-ct-unit_gm
     needs:
@@ -2326,13 +3063,22 @@ jobs:
     - name: RUN ct-unit_gm
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_gm
+        make -C deps/rabbit ct-unit_gm \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_gm-logs
-        path: ct-unit_gm-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_log_config:
     name: rabbit-ct-unit_log_config
     needs:
@@ -2351,13 +3097,22 @@ jobs:
     - name: RUN ct-unit_log_config
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_log_config
+        make -C deps/rabbit ct-unit_log_config \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_log_config-logs
-        path: ct-unit_log_config-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_log_management:
     name: rabbit-ct-unit_log_management
     needs:
@@ -2376,13 +3131,22 @@ jobs:
     - name: RUN ct-unit_log_management
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_log_management
+        make -C deps/rabbit ct-unit_log_management \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_log_management-logs
-        path: ct-unit_log_management-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_operator_policy:
     name: rabbit-ct-unit_operator_policy
     needs:
@@ -2401,13 +3165,22 @@ jobs:
     - name: RUN ct-unit_operator_policy
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_operator_policy
+        make -C deps/rabbit ct-unit_operator_policy \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_operator_policy-logs
-        path: ct-unit_operator_policy-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_pg_local:
     name: rabbit-ct-unit_pg_local
     needs:
@@ -2426,13 +3199,22 @@ jobs:
     - name: RUN ct-unit_pg_local
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_pg_local
+        make -C deps/rabbit ct-unit_pg_local \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_pg_local-logs
-        path: ct-unit_pg_local-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_plugin_directories:
     name: rabbit-ct-unit_plugin_directories
     needs:
@@ -2451,13 +3233,22 @@ jobs:
     - name: RUN ct-unit_plugin_directories
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_plugin_directories
+        make -C deps/rabbit ct-unit_plugin_directories \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_plugin_directories-logs
-        path: ct-unit_plugin_directories-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_plugin_versioning:
     name: rabbit-ct-unit_plugin_versioning
     needs:
@@ -2476,13 +3267,22 @@ jobs:
     - name: RUN ct-unit_plugin_versioning
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_plugin_versioning
+        make -C deps/rabbit ct-unit_plugin_versioning \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_plugin_versioning-logs
-        path: ct-unit_plugin_versioning-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_policy_validators:
     name: rabbit-ct-unit_policy_validators
     needs:
@@ -2501,13 +3301,22 @@ jobs:
     - name: RUN ct-unit_policy_validators
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_policy_validators
+        make -C deps/rabbit ct-unit_policy_validators \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_policy_validators-logs
-        path: ct-unit_policy_validators-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_priority_queue:
     name: rabbit-ct-unit_priority_queue
     needs:
@@ -2526,13 +3335,22 @@ jobs:
     - name: RUN ct-unit_priority_queue
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_priority_queue
+        make -C deps/rabbit ct-unit_priority_queue \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_priority_queue-logs
-        path: ct-unit_priority_queue-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_queue_consumers:
     name: rabbit-ct-unit_queue_consumers
     needs:
@@ -2551,13 +3369,22 @@ jobs:
     - name: RUN ct-unit_queue_consumers
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_queue_consumers
+        make -C deps/rabbit ct-unit_queue_consumers \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_queue_consumers-logs
-        path: ct-unit_queue_consumers-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_stats_and_metrics:
     name: rabbit-ct-unit_stats_and_metrics
     needs:
@@ -2576,13 +3403,22 @@ jobs:
     - name: RUN ct-unit_stats_and_metrics
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_stats_and_metrics
+        make -C deps/rabbit ct-unit_stats_and_metrics \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_stats_and_metrics-logs
-        path: ct-unit_stats_and_metrics-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_supervisor2:
     name: rabbit-ct-unit_supervisor2
     needs:
@@ -2601,13 +3437,22 @@ jobs:
     - name: RUN ct-unit_supervisor2
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_supervisor2
+        make -C deps/rabbit ct-unit_supervisor2 \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_supervisor2-logs
-        path: ct-unit_supervisor2-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-unit_vm_memory_monitor:
     name: rabbit-ct-unit_vm_memory_monitor
     needs:
@@ -2626,13 +3471,22 @@ jobs:
     - name: RUN ct-unit_vm_memory_monitor
       id: tests
       run: |
-        make -C deps/rabbit ct-unit_vm_memory_monitor
+        make -C deps/rabbit ct-unit_vm_memory_monitor \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-unit_vm_memory_monitor-logs
-        path: ct-unit_vm_memory_monitor-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-upgrade_preparation:
     name: rabbit-ct-upgrade_preparation
     needs:
@@ -2651,13 +3505,22 @@ jobs:
     - name: RUN ct-upgrade_preparation
       id: tests
       run: |
-        make -C deps/rabbit ct-upgrade_preparation
+        make -C deps/rabbit ct-upgrade_preparation \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-upgrade_preparation-logs
-        path: ct-upgrade_preparation-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit-ct-vhost:
     name: rabbit-ct-vhost
     needs:
@@ -2676,13 +3539,22 @@ jobs:
     - name: RUN ct-vhost
       id: tests
       run: |
-        make -C deps/rabbit ct-vhost
+        make -C deps/rabbit ct-vhost \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure() && steps.tests.outcome == 'failure'
+      run: |
+        make -C deps/rabbit ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure() && steps.tests.outcome == 'failure'
       with:
         name: rabbit-ct-vhost-logs
-        path: ct-vhost-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbit/*-ct-logs-*.tar.xz
   rabbit:
     name: rabbit
     needs:
@@ -2804,13 +3676,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/amqp_client tests
+        make -C deps/amqp_client tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/amqp_client ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: amqp_client-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/amqp_client/*-ct-logs-*.tar.xz
   amqp10_client:
     name: amqp10_client
     needs:
@@ -2827,13 +3708,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/amqp10_client tests
+        make -C deps/amqp10_client tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/amqp10_client ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: amqp10_client-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/amqp10_client/*-ct-logs-*.tar.xz
   amqp10_common:
     name: amqp10_common
     needs:
@@ -2850,13 +3740,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/amqp10_common tests
+        make -C deps/amqp10_common tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/amqp10_common ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: amqp10_common-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/amqp10_common/*-ct-logs-*.tar.xz
   rabbitmq_amqp1_0:
     name: rabbitmq_amqp1_0
     needs:
@@ -2873,13 +3772,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_amqp1_0 tests
+        make -C deps/rabbitmq_amqp1_0 tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_amqp1_0 ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_amqp1_0-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_amqp1_0/*-ct-logs-*.tar.xz
   rabbitmq_auth_backend_cache:
     name: rabbitmq_auth_backend_cache
     needs:
@@ -2896,13 +3804,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_cache tests
+        make -C deps/rabbitmq_auth_backend_cache tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_auth_backend_cache ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_auth_backend_cache-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_auth_backend_cache/*-ct-logs-*.tar.xz
   rabbitmq_auth_backend_http:
     name: rabbitmq_auth_backend_http
     needs:
@@ -2919,13 +3836,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_http tests
+        make -C deps/rabbitmq_auth_backend_http tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_auth_backend_http ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_auth_backend_http-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_auth_backend_http/*-ct-logs-*.tar.xz
   rabbitmq_auth_backend_ldap:
     name: rabbitmq_auth_backend_ldap
     needs:
@@ -2942,13 +3868,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_ldap tests
+        make -C deps/rabbitmq_auth_backend_ldap tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_auth_backend_ldap ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_auth_backend_ldap-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_auth_backend_ldap/*-ct-logs-*.tar.xz
   rabbitmq_auth_backend_oauth2:
     name: rabbitmq_auth_backend_oauth2
     needs:
@@ -2965,13 +3900,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_oauth2 tests
+        make -C deps/rabbitmq_auth_backend_oauth2 tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_auth_backend_oauth2 ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_auth_backend_oauth2-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_auth_backend_oauth2/*-ct-logs-*.tar.xz
   rabbitmq_auth_mechanism_ssl:
     name: rabbitmq_auth_mechanism_ssl
     needs:
@@ -2988,13 +3932,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_mechanism_ssl tests
+        make -C deps/rabbitmq_auth_mechanism_ssl tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_auth_mechanism_ssl ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_auth_mechanism_ssl-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_auth_mechanism_ssl/*-ct-logs-*.tar.xz
   rabbitmq_aws:
     name: rabbitmq_aws
     needs:
@@ -3011,13 +3964,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_aws tests
+        make -C deps/rabbitmq_aws tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_aws ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_aws-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_aws/*-ct-logs-*.tar.xz
   rabbitmq_cli:
     name: rabbitmq_cli
     needs:
@@ -3062,13 +4024,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_consistent_hash_exchange tests
+        make -C deps/rabbitmq_consistent_hash_exchange tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_consistent_hash_exchange ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_consistent_hash_exchange-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_consistent_hash_exchange/*-ct-logs-*.tar.xz
   rabbitmq_event_exchange:
     name: rabbitmq_event_exchange
     needs:
@@ -3085,13 +4056,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_event_exchange tests
+        make -C deps/rabbitmq_event_exchange tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_event_exchange ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_event_exchange-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_event_exchange/*-ct-logs-*.tar.xz
   rabbitmq_federation:
     name: rabbitmq_federation
     needs:
@@ -3108,13 +4088,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_federation tests
+        make -C deps/rabbitmq_federation tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_federation ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_federation-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_federation/*-ct-logs-*.tar.xz
   rabbitmq_federation_management:
     name: rabbitmq_federation_management
     needs:
@@ -3131,13 +4120,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_federation_management tests
+        make -C deps/rabbitmq_federation_management tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_federation_management ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_federation_management-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_federation_management/*-ct-logs-*.tar.xz
   rabbitmq_jms_topic_exchange:
     name: rabbitmq_jms_topic_exchange
     needs:
@@ -3154,13 +4152,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_jms_topic_exchange tests
+        make -C deps/rabbitmq_jms_topic_exchange tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_jms_topic_exchange ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_jms_topic_exchange-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_jms_topic_exchange/*-ct-logs-*.tar.xz
   rabbitmq_management:
     name: rabbitmq_management
     needs:
@@ -3177,13 +4184,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_management tests
+        make -C deps/rabbitmq_management tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_management ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_management-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_management/*-ct-logs-*.tar.xz
   rabbitmq_management_agent:
     name: rabbitmq_management_agent
     needs:
@@ -3200,13 +4216,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_management_agent tests
+        make -C deps/rabbitmq_management_agent tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_management_agent ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_management_agent-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_management_agent/*-ct-logs-*.tar.xz
   rabbitmq_mqtt:
     name: rabbitmq_mqtt
     needs:
@@ -3223,13 +4248,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_mqtt tests
+        make -C deps/rabbitmq_mqtt tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_mqtt ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_mqtt-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_mqtt/*-ct-logs-*.tar.xz
   rabbitmq_peer_discovery_common:
     name: rabbitmq_peer_discovery_common
     needs:
@@ -3246,13 +4280,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_common tests
+        make -C deps/rabbitmq_peer_discovery_common tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_peer_discovery_common ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_peer_discovery_common-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_peer_discovery_common/*-ct-logs-*.tar.xz
   rabbitmq_peer_discovery_aws:
     name: rabbitmq_peer_discovery_aws
     needs:
@@ -3274,13 +4317,22 @@ jobs:
         echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > terraform/id_rsa_terraform.pub
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_aws tests
+        make -C deps/rabbitmq_peer_discovery_aws tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_peer_discovery_aws ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_peer_discovery_aws-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_peer_discovery_aws/*-ct-logs-*.tar.xz
   rabbitmq_peer_discovery_k8s:
     name: rabbitmq_peer_discovery_k8s
     needs:
@@ -3297,13 +4349,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_k8s tests
+        make -C deps/rabbitmq_peer_discovery_k8s tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_peer_discovery_k8s ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_peer_discovery_k8s-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_peer_discovery_k8s/*-ct-logs-*.tar.xz
   rabbitmq_peer_discovery_consul:
     name: rabbitmq_peer_discovery_consul
     needs:
@@ -3320,13 +4381,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_consul tests
+        make -C deps/rabbitmq_peer_discovery_consul tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_peer_discovery_consul ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_peer_discovery_consul-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_peer_discovery_consul/*-ct-logs-*.tar.xz
   rabbitmq_peer_discovery_etcd:
     name: rabbitmq_peer_discovery_etcd
     needs:
@@ -3343,13 +4413,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_etcd tests
+        make -C deps/rabbitmq_peer_discovery_etcd tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_peer_discovery_etcd ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_peer_discovery_etcd-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_peer_discovery_etcd/*-ct-logs-*.tar.xz
   rabbitmq_prometheus:
     name: rabbitmq_prometheus
     needs:
@@ -3366,13 +4445,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_prometheus tests
+        make -C deps/rabbitmq_prometheus tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_prometheus ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_prometheus-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_prometheus/*-ct-logs-*.tar.xz
   rabbitmq_random_exchange:
     name: rabbitmq_random_exchange
     needs:
@@ -3389,13 +4477,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_random_exchange tests
+        make -C deps/rabbitmq_random_exchange tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_random_exchange ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_random_exchange-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_random_exchange/*-ct-logs-*.tar.xz
   rabbitmq_recent_history_exchange:
     name: rabbitmq_recent_history_exchange
     needs:
@@ -3412,13 +4509,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_recent_history_exchange tests
+        make -C deps/rabbitmq_recent_history_exchange tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_recent_history_exchange ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_recent_history_exchange-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_recent_history_exchange/*-ct-logs-*.tar.xz
   rabbitmq_sharding:
     name: rabbitmq_sharding
     needs:
@@ -3435,13 +4541,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_sharding tests
+        make -C deps/rabbitmq_sharding tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_sharding ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_sharding-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_sharding/*-ct-logs-*.tar.xz
   rabbitmq_shovel:
     name: rabbitmq_shovel
     needs:
@@ -3458,13 +4573,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_shovel tests
+        make -C deps/rabbitmq_shovel tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_shovel ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_shovel-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_shovel/*-ct-logs-*.tar.xz
   rabbitmq_shovel_management:
     name: rabbitmq_shovel_management
     needs:
@@ -3481,13 +4605,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_shovel_management tests
+        make -C deps/rabbitmq_shovel_management tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_shovel_management ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_shovel_management-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_shovel_management/*-ct-logs-*.tar.xz
   rabbitmq_stomp:
     name: rabbitmq_stomp
     needs:
@@ -3504,13 +4637,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stomp tests
+        make -C deps/rabbitmq_stomp tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_stomp ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_stomp-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_stomp/*-ct-logs-*.tar.xz
   rabbitmq_stream:
     name: rabbitmq_stream
     needs:
@@ -3527,13 +4669,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stream tests
+        make -C deps/rabbitmq_stream tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_stream ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_stream-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_stream/*-ct-logs-*.tar.xz
   rabbitmq_stream_management:
     name: rabbitmq_stream_management
     needs:
@@ -3550,13 +4701,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stream_management tests
+        make -C deps/rabbitmq_stream_management tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_stream_management ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_stream_management-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_stream_management/*-ct-logs-*.tar.xz
   rabbitmq_stream_prometheus:
     name: rabbitmq_stream_prometheus
     needs:
@@ -3573,13 +4733,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stream_prometheus tests
+        make -C deps/rabbitmq_stream_prometheus tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_stream_prometheus ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_stream_prometheus-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_stream_prometheus/*-ct-logs-*.tar.xz
   rabbitmq_top:
     name: rabbitmq_top
     needs:
@@ -3596,13 +4765,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_top tests
+        make -C deps/rabbitmq_top tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_top ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_top-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_top/*-ct-logs-*.tar.xz
   rabbitmq_tracing:
     name: rabbitmq_tracing
     needs:
@@ -3619,13 +4797,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_tracing tests
+        make -C deps/rabbitmq_tracing tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_tracing ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_tracing-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_tracing/*-ct-logs-*.tar.xz
   rabbitmq_trust_store:
     name: rabbitmq_trust_store
     needs:
@@ -3642,13 +4829,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_trust_store tests
+        make -C deps/rabbitmq_trust_store tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_trust_store ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_trust_store-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_trust_store/*-ct-logs-*.tar.xz
   rabbitmq_web_dispatch:
     name: rabbitmq_web_dispatch
     needs:
@@ -3665,13 +4861,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_dispatch tests
+        make -C deps/rabbitmq_web_dispatch tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_web_dispatch ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_web_dispatch-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_web_dispatch/*-ct-logs-*.tar.xz
   rabbitmq_web_mqtt:
     name: rabbitmq_web_mqtt
     needs:
@@ -3688,13 +4893,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_mqtt tests
+        make -C deps/rabbitmq_web_mqtt tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_web_mqtt ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_web_mqtt-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_web_mqtt/*-ct-logs-*.tar.xz
   rabbitmq_web_mqtt_examples:
     name: rabbitmq_web_mqtt_examples
     needs:
@@ -3711,13 +4925,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_mqtt_examples tests
+        make -C deps/rabbitmq_web_mqtt_examples tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_web_mqtt_examples ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_web_mqtt_examples-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_web_mqtt_examples/*-ct-logs-*.tar.xz
   rabbitmq_web_stomp:
     name: rabbitmq_web_stomp
     needs:
@@ -3734,13 +4957,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_stomp tests
+        make -C deps/rabbitmq_web_stomp tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_web_stomp ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_web_stomp-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_web_stomp/*-ct-logs-*.tar.xz
   rabbitmq_web_stomp_examples:
     name: rabbitmq_web_stomp_examples
     needs:
@@ -3757,13 +4989,22 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_stomp_examples tests
+        make -C deps/rabbitmq_web_stomp_examples tests \
+          base_rmq_ref=master \
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+          FULL= \
+          FAIL_FAST=1 \
+          SKIP_AS_ERROR=1
+    - name: ON FAILRUE ARCHIVE TESTS LOGS
+      if: failure()
+      run: |
+        make -C deps/rabbitmq_web_stomp_examples ct-logs-archive
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
       with:
         name: rabbitmq_web_stomp_examples-ct-logs
-        path: ct-logs/*-ct-logs-*.tar.xz
+        path: deps/rabbitmq_web_stomp_examples/*-ct-logs-*.tar.xz
   finish:
     name: finish
     needs:

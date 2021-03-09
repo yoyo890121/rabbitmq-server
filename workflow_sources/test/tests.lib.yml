@@ -25,14 +25,23 @@ steps:
   #@ end
   - name: RUN TESTS
     run: |
-      make -C deps/(@= dep.name @) tests
+      make -C deps/(@= dep.name @) tests \
+        base_rmq_ref=(@= data.values.base_rmq_ref @) \
+        current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+        FULL= \
+        FAIL_FAST=1 \
+        SKIP_AS_ERROR=1
+  - name: ON FAILRUE ARCHIVE TESTS LOGS
+    if: failure()
+    run: |
+      make -C deps/(@= dep.name @) ct-logs-archive
   - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview
     if: failure()
     with:
       name: (@= dep.name @)-ct-logs
-      path: "ct-logs/*-ct-logs-*.tar.xz"
+      path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
 #@ end
 
 #@ def additional_docker_args(dep, erlang_version=None):

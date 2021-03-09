@@ -5,7 +5,7 @@
 #@ load("dep.star", "dep_jobs")
 #@ load("finish.lib.yml", "finish_jobs")
 
-#@ erlang_version = data.values.erlang_versions[-1]
+#@ erlang_version = "23.1"
 
 #@ prepare = prepare_jobs(erlang_version=erlang_version, build_erlang=False)
 #@ deps = [dep_jobs(dep, erlang_version=erlang_version) for dep in data.values.deps]

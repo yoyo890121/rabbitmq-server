@@ -39,6 +39,57 @@ prepare:
       run: |
         rm -rf erlang-git-master
     #@ end
+    #@ if erlang_version != "git":
+    - name: CACHE SECONDARY UMBRELLAS
+      uses: actions/cache@v1
+      with:
+        path: umbrellas
+        key: #@ "secondary-umbrellas-{}-erlang-{}".format("-".join(data.values.secondary_umbrella_gitrefs), erlang_version)
+    - name: PREPARE SECONDARY UMBRELLA COPIES
+      #@ versions = " ".join(data.values.secondary_umbrella_gitrefs)
+      run: |
+        set -ex
+        for version in (@= versions @); do
+          umbrella="umbrellas/$version"
+          if ! test -d "$umbrella"  ||
+              ! make -C "$umbrella/deps/rabbit" test-dist; then
+            rm -rf "$umbrella"
+            # Fetch the master Umbrella; the final umbrellas are created from
+            # the master copy.
+            if ! test -d umbrellas/master; then
+              git config --global advice.detachedHead false
+              git clone \
+                https://github.com/rabbitmq/rabbitmq-public-umbrella.git \
+                umbrellas/master
+              make -C umbrellas/master co # To get RabbitMQ components.
+            fi
+            # We copy the master Umbrella and checkout the appropriate tag.
+            cp -a umbrellas/master "$umbrella"
+            git -C "$umbrella" checkout "master"
+            make -C "$umbrella" up BRANCH="$version"
+            # To remove third-party deps which were checked out when the
+            # projects were on the `master` branch. Thus, possibly not the
+            # version pinning we expect. We update the Umbrella one last time
+            # to fetch the correct third-party deps.
+            make -C "$umbrella" clean-3rd-party-repos
+            make -C "$umbrella" up
+            make -C "$umbrella/deps/rabbit" test-dist
+            rm -rf "$umbrella"/deps/rabbitmq_website
+            rm -rf "$umbrella"/deps/rabbitmq_prometheus/docker
+            rm -rf "$umbrella"/deps/*/{.git,test} "$umbrella"/.git
+          fi
+        done
+        rm -fr umbrellas/master
+    - name: CREATE SECONDARY UMBRELLAS ARCHIVE
+      run: |
+        set -ex
+        tar cf - umbrellas | xz > secondary-umbrellas.tar.xz
+    - name: UPLOAD SECONDARY UMBRELLAS ARCHIVE
+      uses: actions/upload-artifact@v2
+      with:
+        name: secondary-umbrellas.tar.xz
+        path: secondary-umbrellas.tar.xz
+    #@ end
 xref:
   name: xref
   #@ if build_erlang:
@@ -59,11 +110,11 @@ xref:
     - name: RUN XREF (@= dep.name @)
       run: |
         make -C deps/(@= dep.name @) xref \
-          base_rmq_ref=master \
+          base_rmq_ref=(@= data.values.base_rmq_ref @) \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     #@ end
 
-#@ if/end erlang_version == data.values.erlang_versions[-1]:
+#@ if/end erlang_version != "git":
 dialyze:
   name: dialyze
   #@ if build_erlang:
@@ -84,7 +135,7 @@ dialyze:
     - name: RUN DIALYZE (@= dep.name @)
       run: |
         make -C deps/(@= dep.name @) dialyze \
-          base_rmq_ref=master \
+          base_rmq_ref=(@= data.values.base_rmq_ref @) \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
           FULL=
     #@ end

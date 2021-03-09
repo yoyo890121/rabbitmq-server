@@ -4,7 +4,4 @@ base_rmq_ref: master
 secondary_umbrella_gitrefs:
 - v3.7.28
 - v3.8.9
-erlang_versions:
-- "22.3"
-- "23.1"
 elixir_version: 1.10.4
