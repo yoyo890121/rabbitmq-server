@@ -9,6 +9,11 @@ runs-on: ubuntu-18.04
 if: #@ skip_ci_condition()
 #@yaml/text-templated-strings
 steps:
+  - name: CONFIGURE OTP & ELIXIR
+    uses: actions/setup-elixir@v1
+    with:
+      otp-version: #@ erlang_version
+      elixir-version: 1.10.4
   #@ if getattr(dep, 'use_terraform', False):
   - name: PREPARE TERRAFORM SECRETS
     run: |

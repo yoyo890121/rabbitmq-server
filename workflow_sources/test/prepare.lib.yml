@@ -13,12 +13,10 @@ prepare:
   steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
-    #! https://github.com/marketplace/actions/setup-elixir
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
-        otp-version: 23.1
-        #! https://github.com/elixir-lang/elixir/releases
+        otp-version: #@ erlang_version
         elixir-version: 1.10.4
     - name: CHECK RABBITMQ COMPONENTS
       id: ref
@@ -52,6 +50,11 @@ xref:
   steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: #@ erlang_version
+        elixir-version: 1.10.4
     #@ for dep in [d for d in data.values.deps if not getattr(d, "skip_xref", False)]:
     - name: RUN XREF (@= dep.name @)
       run: |
@@ -72,6 +75,11 @@ dialyze:
   steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: #@ erlang_version
+        elixir-version: 1.10.4
     #@ for dep in [d for d in data.values.deps if not getattr(d, "skip_dialyzer", False)]:
     - name: RUN DIALYZE (@= dep.name @)
       run: |

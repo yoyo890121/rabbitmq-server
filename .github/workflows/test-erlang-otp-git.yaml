@@ -16,7 +16,7 @@ jobs:
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
-        otp-version: 23.1
+        otp-version: git
         elixir-version: 1.10.4
     - name: CHECK RABBITMQ COMPONENTS
       id: ref
@@ -46,6 +46,11 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN XREF rabbit_common
       run: |
         make -C deps/rabbit_common xref \
@@ -273,6 +278,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbit_common tests
@@ -304,6 +314,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-amqqueue_backward_compatibility
       id: tests
       run: |
@@ -322,6 +339,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-backing_queue
       id: tests
       run: |
@@ -340,6 +364,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-channel_interceptor
       id: tests
       run: |
@@ -358,6 +389,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-channel_operation_timeout
       id: tests
       run: |
@@ -376,6 +414,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-cluster
       id: tests
       run: |
@@ -394,6 +439,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-cluster_rename
       id: tests
       run: |
@@ -412,6 +464,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-clustering_management
       id: tests
       run: |
@@ -430,6 +489,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-config_schema
       id: tests
       run: |
@@ -448,6 +514,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-confirms_rejects
       id: tests
       run: |
@@ -466,6 +539,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-consumer_timeout
       id: tests
       run: |
@@ -484,6 +564,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-crashing_queues
       id: tests
       run: |
@@ -502,6 +589,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-dead_lettering
       id: tests
       run: |
@@ -520,6 +614,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-definition_import
       id: tests
       run: |
@@ -538,6 +639,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-disconnect_detected_during_alarm
       id: tests
       run: |
@@ -556,6 +664,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-dynamic_ha
       id: tests
       run: |
@@ -574,6 +689,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-dynamic_qq
       id: tests
       run: |
@@ -592,6 +714,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-eager_sync
       id: tests
       run: |
@@ -610,6 +739,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-feature_flags
       id: tests
       run: |
@@ -628,6 +764,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-lazy_queue
       id: tests
       run: |
@@ -646,6 +789,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-list_consumers_sanity_check
       id: tests
       run: |
@@ -664,6 +814,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-list_queues_online_and_offline
       id: tests
       run: |
@@ -682,6 +839,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-maintenance_mode
       id: tests
       run: |
@@ -700,6 +864,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-many_node_ha
       id: tests
       run: |
@@ -718,6 +889,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-message_size_limit
       id: tests
       run: |
@@ -736,6 +914,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-metrics
       id: tests
       run: |
@@ -754,6 +939,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-mirrored_supervisor
       id: tests
       run: |
@@ -772,6 +964,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-msg_store
       id: tests
       run: |
@@ -790,6 +989,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-peer_discovery_classic_config
       id: tests
       run: |
@@ -808,6 +1014,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-peer_discovery_dns
       id: tests
       run: |
@@ -826,6 +1039,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_channel_limit
       id: tests
       run: |
@@ -844,6 +1064,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_channel_limit_partitions
       id: tests
       run: |
@@ -862,6 +1089,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_channel_tracking
       id: tests
       run: |
@@ -880,6 +1114,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_tracking
       id: tests
       run: |
@@ -898,6 +1139,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_vhost_connection_limit
       id: tests
       run: |
@@ -916,6 +1164,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_vhost_connection_limit_partitions
       id: tests
       run: |
@@ -934,6 +1189,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_vhost_msg_store
       id: tests
       run: |
@@ -952,6 +1214,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-per_vhost_queue_limit
       id: tests
       run: |
@@ -970,6 +1239,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-policy
       id: tests
       run: |
@@ -988,6 +1264,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-priority_queue
       id: tests
       run: |
@@ -1006,6 +1289,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-priority_queue_recovery
       id: tests
       run: |
@@ -1024,6 +1314,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-product_info
       id: tests
       run: |
@@ -1042,6 +1339,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-proxy_protocol
       id: tests
       run: |
@@ -1060,6 +1364,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-publisher_confirms_parallel
       id: tests
       run: |
@@ -1078,6 +1389,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-queue_length_limits
       id: tests
       run: |
@@ -1096,6 +1414,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-queue_master_location
       id: tests
       run: |
@@ -1114,6 +1439,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-queue_parallel
       id: tests
       run: |
@@ -1132,6 +1464,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-queue_type
       id: tests
       run: |
@@ -1150,6 +1489,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-quorum_queue
       id: tests
       run: |
@@ -1168,6 +1514,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_confirms
       id: tests
       run: |
@@ -1186,6 +1539,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_core_metrics_gc
       id: tests
       run: |
@@ -1204,6 +1564,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo
       id: tests
       run: |
@@ -1222,6 +1589,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo_int
       id: tests
       run: |
@@ -1240,6 +1614,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo_prop
       id: tests
       run: |
@@ -1258,6 +1639,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo_v0
       id: tests
       run: |
@@ -1276,6 +1664,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_msg_record
       id: tests
       run: |
@@ -1294,6 +1689,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbit_stream_queue
       id: tests
       run: |
@@ -1312,6 +1714,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbitmq_queues_cli_integration
       id: tests
       run: |
@@ -1330,6 +1739,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbitmqctl_integration
       id: tests
       run: |
@@ -1348,6 +1764,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-rabbitmqctl_shutdown
       id: tests
       run: |
@@ -1366,6 +1789,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-signal_handling
       id: tests
       run: |
@@ -1384,6 +1814,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-simple_ha
       id: tests
       run: |
@@ -1402,6 +1839,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-single_active_consumer
       id: tests
       run: |
@@ -1420,6 +1864,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-sync_detection
       id: tests
       run: |
@@ -1438,6 +1889,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-term_to_binary_compat_prop
       id: tests
       run: |
@@ -1456,6 +1914,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-topic_permission
       id: tests
       run: |
@@ -1474,6 +1939,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_access_control
       id: tests
       run: |
@@ -1492,6 +1964,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_access_control_authn_authz_context_propagation
       id: tests
       run: |
@@ -1510,6 +1989,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_access_control_credential_validation
       id: tests
       run: |
@@ -1528,6 +2014,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_amqp091_content_framing
       id: tests
       run: |
@@ -1546,6 +2039,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_amqp091_server_properties
       id: tests
       run: |
@@ -1564,6 +2064,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_app_management
       id: tests
       run: |
@@ -1582,6 +2089,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_cluster_formation_locking_mocks
       id: tests
       run: |
@@ -1600,6 +2114,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_collections
       id: tests
       run: |
@@ -1618,6 +2139,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_config_value_encryption
       id: tests
       run: |
@@ -1636,6 +2164,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_connection_tracking
       id: tests
       run: |
@@ -1654,6 +2189,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_credit_flow
       id: tests
       run: |
@@ -1672,6 +2214,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_disk_monitor
       id: tests
       run: |
@@ -1690,6 +2239,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_disk_monitor_mocks
       id: tests
       run: |
@@ -1708,6 +2264,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_file_handle_cache
       id: tests
       run: |
@@ -1726,6 +2289,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_gen_server2
       id: tests
       run: |
@@ -1744,6 +2314,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_gm
       id: tests
       run: |
@@ -1762,6 +2339,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_log_config
       id: tests
       run: |
@@ -1780,6 +2364,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_log_management
       id: tests
       run: |
@@ -1798,6 +2389,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_operator_policy
       id: tests
       run: |
@@ -1816,6 +2414,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_pg_local
       id: tests
       run: |
@@ -1834,6 +2439,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_plugin_directories
       id: tests
       run: |
@@ -1852,6 +2464,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_plugin_versioning
       id: tests
       run: |
@@ -1870,6 +2489,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_policy_validators
       id: tests
       run: |
@@ -1888,6 +2514,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_priority_queue
       id: tests
       run: |
@@ -1906,6 +2539,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_queue_consumers
       id: tests
       run: |
@@ -1924,6 +2564,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_stats_and_metrics
       id: tests
       run: |
@@ -1942,6 +2589,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_supervisor2
       id: tests
       run: |
@@ -1960,6 +2614,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-unit_vm_memory_monitor
       id: tests
       run: |
@@ -1978,6 +2639,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-upgrade_preparation
       id: tests
       run: |
@@ -1996,6 +2664,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN ct-vhost
       id: tests
       run: |
@@ -2118,6 +2793,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/amqp_client tests
@@ -2134,6 +2814,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/amqp10_client tests
@@ -2150,6 +2835,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/amqp10_common tests
@@ -2166,6 +2856,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_amqp1_0 tests
@@ -2182,6 +2877,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_auth_backend_cache tests
@@ -2198,6 +2898,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_auth_backend_http tests
@@ -2214,6 +2919,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_auth_backend_ldap tests
@@ -2230,6 +2940,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_auth_backend_oauth2 tests
@@ -2246,6 +2961,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_auth_mechanism_ssl tests
@@ -2262,6 +2982,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_aws tests
@@ -2278,10 +3003,13 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
-    - name: RECORD STEP START
-      id: buildevents
-      run: |
-        echo "::set-output name=step_start::$(date +%s)"
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: START BACKGROUND BROKER
       run: |
         make start-background-broker \
@@ -2303,6 +3031,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_consistent_hash_exchange tests
@@ -2319,6 +3052,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_event_exchange tests
@@ -2335,6 +3073,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_federation tests
@@ -2351,6 +3094,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_federation_management tests
@@ -2367,6 +3115,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_jms_topic_exchange tests
@@ -2383,6 +3136,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_management tests
@@ -2399,6 +3157,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_management_agent tests
@@ -2415,6 +3178,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_mqtt tests
@@ -2431,6 +3199,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_peer_discovery_common tests
@@ -2447,6 +3220,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: PREPARE TERRAFORM SECRETS
       run: |
         mkdir terraform && chmod 777 terraform
@@ -2468,6 +3246,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_peer_discovery_k8s tests
@@ -2484,6 +3267,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_peer_discovery_consul tests
@@ -2500,6 +3288,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_peer_discovery_etcd tests
@@ -2516,6 +3309,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_prometheus tests
@@ -2532,6 +3330,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_random_exchange tests
@@ -2548,6 +3351,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_recent_history_exchange tests
@@ -2564,6 +3372,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_sharding tests
@@ -2580,6 +3393,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_shovel tests
@@ -2596,6 +3414,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_shovel_management tests
@@ -2612,6 +3435,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_stomp tests
@@ -2628,6 +3456,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_stream tests
@@ -2644,6 +3477,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_stream_management tests
@@ -2660,6 +3498,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_stream_prometheus tests
@@ -2676,6 +3519,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_top tests
@@ -2692,6 +3540,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_tracing tests
@@ -2708,6 +3561,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_trust_store tests
@@ -2724,6 +3582,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_web_dispatch tests
@@ -2740,6 +3603,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_web_mqtt tests
@@ -2756,6 +3624,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_web_mqtt_examples tests
@@ -2772,6 +3645,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_web_stomp tests
@@ -2788,6 +3666,11 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CONFIGURE OTP & ELIXIR
+      uses: actions/setup-elixir@v1
+      with:
+        otp-version: git
+        elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_web_stomp_examples tests
