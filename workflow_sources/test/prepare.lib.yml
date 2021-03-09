@@ -115,7 +115,7 @@ xref:
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     #@ end
 
-#@ if/end erlang_version != "git":
+#@ if erlang_version != "git":
 dialyze:
   name: dialyze
   #@ if build_erlang:
@@ -140,4 +140,5 @@ dialyze:
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
           FULL=
     #@ end
+#@ end
 #@ end
