@@ -7,3 +7,4 @@ secondary_umbrella_gitrefs:
 erlang_versions:
 - "22.3"
 - "23.1"
+elixir_version: 1.10.4

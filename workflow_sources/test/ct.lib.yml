@@ -36,7 +36,7 @@ steps:
     uses: actions/setup-elixir@v1
     with:
       otp-version: #@ erlang_version
-      elixir-version: 1.10.4
+      elixir-version: #@ data.values.elixir_version
   - name: #@ "RUN ct-" + suite_name
     id: tests
     run: |

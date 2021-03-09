@@ -17,7 +17,7 @@ prepare:
       uses: actions/setup-elixir@v1
       with:
         otp-version: #@ erlang_version
-        elixir-version: 1.10.4
+        elixir-version: #@ data.values.elixir_version
     - name: CHECK RABBITMQ COMPONENTS
       id: ref
       run: |
@@ -54,7 +54,7 @@ xref:
       uses: actions/setup-elixir@v1
       with:
         otp-version: #@ erlang_version
-        elixir-version: 1.10.4
+        elixir-version: #@ data.values.elixir_version
     #@ for dep in [d for d in data.values.deps if not getattr(d, "skip_xref", False)]:
     - name: RUN XREF (@= dep.name @)
       run: |
@@ -79,7 +79,7 @@ dialyze:
       uses: actions/setup-elixir@v1
       with:
         otp-version: #@ erlang_version
-        elixir-version: 1.10.4
+        elixir-version: #@ data.values.elixir_version
     #@ for dep in [d for d in data.values.deps if not getattr(d, "skip_dialyzer", False)]:
     - name: RUN DIALYZE (@= dep.name @)
       run: |

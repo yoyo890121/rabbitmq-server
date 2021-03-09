@@ -355,6 +355,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2870,6 +2872,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2891,6 +2895,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2912,6 +2918,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2933,6 +2941,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2954,6 +2964,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2975,6 +2987,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -2996,6 +3010,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3017,6 +3033,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3038,6 +3056,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3059,6 +3079,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3108,6 +3130,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3129,6 +3153,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3150,6 +3176,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3171,6 +3199,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3192,6 +3222,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3213,6 +3245,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3234,6 +3268,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3255,6 +3291,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3276,6 +3314,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3297,6 +3337,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3323,6 +3365,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3344,6 +3388,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3365,6 +3411,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3386,6 +3434,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3407,6 +3457,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3428,6 +3480,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3449,6 +3503,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3470,6 +3526,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3491,6 +3549,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3512,6 +3572,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3533,6 +3595,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3554,6 +3618,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3575,6 +3641,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3596,6 +3664,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3617,6 +3687,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3638,6 +3710,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3659,6 +3733,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3680,6 +3756,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3701,6 +3779,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3722,6 +3802,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
@@ -3743,6 +3825,8 @@ jobs:
     runs-on: ubuntu-18.04
     if: '!contains(github.event.head_commit.message, ''[ci skip]'')'
     steps:
+    - name: CHECKOUT REPOSITORY
+      uses: actions/checkout@v2
     - name: CONFIGURE OTP & ELIXIR
       uses: actions/setup-elixir@v1
       with:
