@@ -5243,8 +5243,6 @@ jobs:
     - name: INSTALL slapd
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        sudo apt-get update
-
         sudo apt-get install -y -V --fix-missing --no-install-recommends \
           debconf-utils
 
@@ -5256,6 +5254,10 @@ jobs:
 
         sudo apt-get install -y -V --fix-missing --no-install-recommends \
           ldap-utils \
+          netcat \
+          python-dev \
+          python-simplejson \
+          python3 \
           slapd
     - name: RUN TESTS
       if: steps.cache.outputs.cache-hit != 'true'

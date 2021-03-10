@@ -150,7 +150,7 @@ deps:
 
 - name: rabbitmq_auth_backend_ldap
   skip_dialyzer: true
-  use_slapd: true
+  needs_slapd: true
   suites:
   - name: config_schema
   - name: system
