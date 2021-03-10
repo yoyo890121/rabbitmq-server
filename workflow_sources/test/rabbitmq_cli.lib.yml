@@ -41,8 +41,12 @@ steps:
       make -C deps/(@= dep.name @) tests MIX_TEST_OPTS="--exclude test"
   - name: RUN TESTS
     if: steps.cache.outputs.cache-hit != 'true'
+    #@ tests_cmd = " || ".join(["run_tests"] * getattr(dep, 'attempts', 1))
     run: |
-      make -C deps/(@= dep.name @) tests
+      function run_tests() {
+        make -C deps/(@= dep.name @) tests
+      }
+      (@= tests_cmd @)
   - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview

@@ -11341,7 +11341,10 @@ jobs:
     - name: RUN TESTS
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        make -C deps/rabbitmq_cli tests
+        function run_tests() {
+          make -C deps/rabbitmq_cli tests
+        }
+        run_tests || run_tests || run_tests
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
