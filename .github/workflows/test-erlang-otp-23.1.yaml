@@ -413,12 +413,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbit_common tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbit_common tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8547,12 +8550,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/amqp_client tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/amqp_client tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8579,12 +8585,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/amqp10_client tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/amqp10_client tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8611,12 +8620,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/amqp10_common tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/amqp10_common tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8643,12 +8655,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_amqp1_0 tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_amqp1_0 tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8675,12 +8690,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_cache tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_auth_backend_cache tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8707,12 +8725,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_http tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_auth_backend_http tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8750,12 +8771,15 @@ jobs:
           slapd
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_ldap tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_auth_backend_ldap tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8782,12 +8806,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_backend_oauth2 tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_auth_backend_oauth2 tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8814,12 +8841,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_auth_mechanism_ssl tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_auth_mechanism_ssl tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8846,12 +8876,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_aws tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_aws tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8910,12 +8943,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_consistent_hash_exchange tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_consistent_hash_exchange tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8942,12 +8978,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_event_exchange tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_event_exchange tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -8974,12 +9013,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_federation tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_federation tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests || run_tests || run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9006,12 +9048,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_federation_management tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_federation_management tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9038,12 +9083,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_jms_topic_exchange tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_jms_topic_exchange tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9070,12 +9118,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_management tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_management tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9102,12 +9153,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_management_agent tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_management_agent tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9134,12 +9188,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_mqtt tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_mqtt tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9166,12 +9223,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_common tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_peer_discovery_common tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9202,16 +9262,19 @@ jobs:
         echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > id_rsa_terraform.pub
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_aws tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1 \
-          ERLANG_VERSION=23.1 \
-          AWS_ACCESS_KEY_ID=${{ secrets.CONCOURSE_AWS_ACCESS_KEY_ID }} \
-          AWS_SECRET_ACCESS_KEY=${{ secrets.CONCOURSE_AWS_SECRET_ACCESS_KEY }} \
-          SSH_KEY=$PWD/id_rsa_terraform
+        function run_tests() {
+          make -C deps/rabbitmq_peer_discovery_aws tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1 \
+            ERLANG_VERSION=23.1 \
+            AWS_ACCESS_KEY_ID=${{ secrets.CONCOURSE_AWS_ACCESS_KEY_ID }} \
+            AWS_SECRET_ACCESS_KEY=${{ secrets.CONCOURSE_AWS_SECRET_ACCESS_KEY }} \
+            SSH_KEY=$PWD/id_rsa_terraform
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9238,12 +9301,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_k8s tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_peer_discovery_k8s tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9270,12 +9336,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_consul tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_peer_discovery_consul tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9306,12 +9375,15 @@ jobs:
           daemonize
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_peer_discovery_etcd tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_peer_discovery_etcd tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9338,12 +9410,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_prometheus tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_prometheus tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9370,12 +9445,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_random_exchange tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_random_exchange tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9402,12 +9480,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_recent_history_exchange tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_recent_history_exchange tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9434,12 +9515,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_sharding tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_sharding tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9466,12 +9550,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_shovel tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_shovel tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9498,12 +9585,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_shovel_management tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_shovel_management tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9530,12 +9620,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stomp tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_stomp tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9562,12 +9655,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stream tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_stream tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9594,12 +9690,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stream_management tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_stream_management tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9626,12 +9725,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_stream_prometheus tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_stream_prometheus tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9658,12 +9760,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_top tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_top tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9690,12 +9795,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_tracing tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_tracing tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9722,12 +9830,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_trust_store tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_trust_store tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9754,12 +9865,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_dispatch tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_web_dispatch tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9786,12 +9900,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_mqtt tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_web_mqtt tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9818,12 +9935,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_mqtt_examples tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_web_mqtt_examples tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9850,12 +9970,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_stomp tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_web_stomp tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -9882,12 +10005,15 @@ jobs:
         elixir-version: 1.10.4
     - name: RUN TESTS
       run: |
-        make -C deps/rabbitmq_web_stomp_examples tests \
-          base_rmq_ref=master \
-          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-          FULL= \
-          FAIL_FAST=1 \
-          SKIP_AS_ERROR=1
+        function run_tests() {
+          make -C deps/rabbitmq_web_stomp_examples tests \
+            base_rmq_ref=master \
+            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
+            FULL= \
+            FAIL_FAST=1 \
+            SKIP_AS_ERROR=1
+        }
+        run_tests
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |

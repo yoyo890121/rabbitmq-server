@@ -195,6 +195,7 @@ deps:
 
 - name: rabbitmq_federation
   skip_dialyzer: true
+  attempts: 3
   suites:
   - name: exchange
   - name: federation_status_command
