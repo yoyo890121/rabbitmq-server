@@ -330,17 +330,31 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-eunit
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: VALIDATE KNOWN CT SUITES
+      if: steps.cache.outputs.cache-hit != 'true'
       env:
         project: rabbit
       run: |
         ci/scripts/validate-workflow.sh amqqueue_backward_compatibility backing_queue channel_interceptor channel_operation_timeout cluster cluster_rename clustering_management config_schema confirms_rejects consumer_timeout crashing_queues dead_lettering definition_import disconnect_detected_during_alarm dynamic_ha dynamic_qq eager_sync feature_flags lazy_queue list_consumers_sanity_check list_queues_online_and_offline maintenance_mode many_node_ha message_size_limit metrics mirrored_supervisor msg_store peer_discovery_classic_config peer_discovery_dns per_user_connection_channel_limit per_user_connection_channel_limit_partitions per_user_connection_channel_tracking per_user_connection_tracking per_vhost_connection_limit per_vhost_connection_limit_partitions per_vhost_msg_store per_vhost_queue_limit policy priority_queue priority_queue_recovery product_info proxy_protocol publisher_confirms_parallel queue_length_limits queue_master_location queue_parallel queue_type quorum_queue rabbit_confirms rabbit_core_metrics_gc rabbit_fifo rabbit_fifo_int rabbit_fifo_prop rabbit_fifo_v0 rabbit_msg_record rabbit_stream_queue rabbitmq_queues_cli_integration rabbitmqctl_integration rabbitmqctl_shutdown signal_handling simple_ha single_active_consumer sync_detection term_to_binary_compat_prop topic_permission unit_access_control unit_access_control_authn_authz_context_propagation unit_access_control_credential_validation unit_amqp091_content_framing unit_amqp091_server_properties unit_app_management unit_cluster_formation_locking_mocks unit_collections unit_config_value_encryption unit_connection_tracking unit_credit_flow unit_disk_monitor unit_disk_monitor_mocks unit_file_handle_cache unit_gen_server2 unit_gm unit_log_config unit_log_management unit_operator_policy unit_pg_local unit_plugin_directories unit_plugin_versioning unit_policy_validators unit_priority_queue unit_queue_consumers unit_stats_and_metrics unit_supervisor2 unit_vm_memory_monitor upgrade_preparation vhost
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN EUNIT
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make eunit \
           base_rmq_ref=master \
@@ -348,6 +362,8 @@ jobs:
           FULL= \
           FAIL_FAST=1 \
           SKIP_AS_ERROR=1
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbit-eunit
   rabbit-ct-amqqueue_backward_compatibility:
     name: rabbit-ct-amqqueue_backward_compatibility
     needs:
@@ -358,12 +374,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-amqqueue_backward_compatibility
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-amqqueue_backward_compatibility
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-amqqueue_backward_compatibility \
@@ -392,12 +421,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-backing_queue
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-backing_queue
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-backing_queue \
@@ -426,12 +468,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-channel_interceptor
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-channel_interceptor
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-channel_interceptor \
@@ -460,12 +515,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-channel_operation_timeout
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-channel_operation_timeout
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-channel_operation_timeout \
@@ -494,12 +562,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-cluster
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-cluster
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-cluster \
@@ -528,12 +609,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-cluster_rename
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-cluster_rename
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-cluster_rename \
@@ -562,12 +656,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-clustering_management
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-clustering_management
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-clustering_management \
@@ -596,12 +703,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-config_schema
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-config_schema
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-config_schema \
@@ -630,12 +750,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-confirms_rejects
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-confirms_rejects
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-confirms_rejects \
@@ -664,12 +797,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-consumer_timeout
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-consumer_timeout
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-consumer_timeout \
@@ -698,12 +844,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-crashing_queues
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-crashing_queues
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-crashing_queues \
@@ -732,12 +891,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-dead_lettering
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-dead_lettering
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-dead_lettering \
@@ -766,12 +938,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-definition_import
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-definition_import
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-definition_import \
@@ -800,12 +985,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-disconnect_detected_during_alarm
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-disconnect_detected_during_alarm
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-disconnect_detected_during_alarm \
@@ -834,12 +1032,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-dynamic_ha
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-dynamic_ha
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-dynamic_ha \
@@ -868,12 +1079,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-dynamic_qq
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-dynamic_qq
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-dynamic_qq \
@@ -902,12 +1126,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-eager_sync
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-eager_sync
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-eager_sync \
@@ -936,12 +1173,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-feature_flags
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-feature_flags
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-feature_flags \
@@ -970,12 +1220,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-lazy_queue
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-lazy_queue
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-lazy_queue \
@@ -1004,12 +1267,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-list_consumers_sanity_check
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-list_consumers_sanity_check
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-list_consumers_sanity_check \
@@ -1038,12 +1314,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-list_queues_online_and_offline
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-list_queues_online_and_offline
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-list_queues_online_and_offline \
@@ -1072,12 +1361,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-maintenance_mode
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-maintenance_mode
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-maintenance_mode \
@@ -1106,12 +1408,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-many_node_ha
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-many_node_ha
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-many_node_ha \
@@ -1140,12 +1455,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-message_size_limit
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-message_size_limit
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-message_size_limit \
@@ -1174,12 +1502,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-metrics
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-metrics
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-metrics \
@@ -1208,12 +1549,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-mirrored_supervisor
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-mirrored_supervisor
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-mirrored_supervisor \
@@ -1242,12 +1596,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-msg_store
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-msg_store
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-msg_store \
@@ -1276,12 +1643,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-peer_discovery_classic_config
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-peer_discovery_classic_config
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-peer_discovery_classic_config \
@@ -1310,12 +1690,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-peer_discovery_dns
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-peer_discovery_dns
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-peer_discovery_dns \
@@ -1344,12 +1737,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_user_connection_channel_limit
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_channel_limit
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_user_connection_channel_limit \
@@ -1378,12 +1784,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_user_connection_channel_limit_partitions
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_channel_limit_partitions
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_user_connection_channel_limit_partitions \
@@ -1412,12 +1831,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_user_connection_channel_tracking
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_channel_tracking
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_user_connection_channel_tracking \
@@ -1446,12 +1878,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_user_connection_tracking
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_user_connection_tracking
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_user_connection_tracking \
@@ -1480,12 +1925,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_vhost_connection_limit
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_vhost_connection_limit
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_vhost_connection_limit \
@@ -1514,12 +1972,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_vhost_connection_limit_partitions
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_vhost_connection_limit_partitions
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_vhost_connection_limit_partitions \
@@ -1548,12 +2019,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_vhost_msg_store
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_vhost_msg_store
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_vhost_msg_store \
@@ -1582,12 +2066,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-per_vhost_queue_limit
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-per_vhost_queue_limit
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-per_vhost_queue_limit \
@@ -1616,12 +2113,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-policy
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-policy
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-policy \
@@ -1650,12 +2160,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-priority_queue
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-priority_queue
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-priority_queue \
@@ -1684,12 +2207,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-priority_queue_recovery
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-priority_queue_recovery
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-priority_queue_recovery \
@@ -1718,12 +2254,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-product_info
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-product_info
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-product_info \
@@ -1752,12 +2301,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-proxy_protocol
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-proxy_protocol
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-proxy_protocol \
@@ -1786,12 +2348,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-publisher_confirms_parallel
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-publisher_confirms_parallel
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-publisher_confirms_parallel \
@@ -1820,12 +2395,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-queue_length_limits
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-queue_length_limits
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-queue_length_limits \
@@ -1854,12 +2442,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-queue_master_location
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-queue_master_location
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-queue_master_location \
@@ -1888,12 +2489,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-queue_parallel
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-queue_parallel
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-queue_parallel \
@@ -1922,12 +2536,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-queue_type
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-queue_type
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-queue_type \
@@ -1956,12 +2583,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-quorum_queue
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-quorum_queue
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-quorum_queue \
@@ -1990,12 +2630,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_confirms
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_confirms
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_confirms \
@@ -2024,12 +2677,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_core_metrics_gc
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_core_metrics_gc
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_core_metrics_gc \
@@ -2058,12 +2724,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_fifo
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_fifo \
@@ -2092,12 +2771,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_fifo_int
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo_int
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_fifo_int \
@@ -2126,12 +2818,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_fifo_prop
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo_prop
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_fifo_prop \
@@ -2160,12 +2865,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_fifo_v0
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_fifo_v0
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_fifo_v0 \
@@ -2194,12 +2912,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_msg_record
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_msg_record
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_msg_record \
@@ -2228,12 +2959,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbit_stream_queue
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbit_stream_queue
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbit_stream_queue \
@@ -2262,12 +3006,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbitmq_queues_cli_integration
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbitmq_queues_cli_integration
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbitmq_queues_cli_integration \
@@ -2296,12 +3053,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbitmqctl_integration
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbitmqctl_integration
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbitmqctl_integration \
@@ -2330,12 +3100,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-rabbitmqctl_shutdown
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-rabbitmqctl_shutdown
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-rabbitmqctl_shutdown \
@@ -2364,12 +3147,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-signal_handling
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-signal_handling
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-signal_handling \
@@ -2398,12 +3194,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-simple_ha
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-simple_ha
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-simple_ha \
@@ -2432,12 +3241,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-single_active_consumer
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-single_active_consumer
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-single_active_consumer \
@@ -2466,12 +3288,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-sync_detection
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-sync_detection
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-sync_detection \
@@ -2500,12 +3335,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-term_to_binary_compat_prop
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-term_to_binary_compat_prop
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-term_to_binary_compat_prop \
@@ -2534,12 +3382,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-topic_permission
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-topic_permission
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-topic_permission \
@@ -2568,12 +3429,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_access_control
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_access_control
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_access_control \
@@ -2602,12 +3476,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_access_control_authn_authz_context_propagation
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_access_control_authn_authz_context_propagation
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_access_control_authn_authz_context_propagation \
@@ -2636,12 +3523,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_access_control_credential_validation
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_access_control_credential_validation
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_access_control_credential_validation \
@@ -2670,12 +3570,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_amqp091_content_framing
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_amqp091_content_framing
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_amqp091_content_framing \
@@ -2704,12 +3617,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_amqp091_server_properties
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_amqp091_server_properties
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_amqp091_server_properties \
@@ -2738,12 +3664,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_app_management
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_app_management
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_app_management \
@@ -2772,12 +3711,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_cluster_formation_locking_mocks
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_cluster_formation_locking_mocks
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_cluster_formation_locking_mocks \
@@ -2806,12 +3758,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_collections
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_collections
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_collections \
@@ -2840,12 +3805,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_config_value_encryption
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_config_value_encryption
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_config_value_encryption \
@@ -2874,12 +3852,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_connection_tracking
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_connection_tracking
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_connection_tracking \
@@ -2908,12 +3899,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_credit_flow
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_credit_flow
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_credit_flow \
@@ -2942,12 +3946,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_disk_monitor
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_disk_monitor
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_disk_monitor \
@@ -2976,12 +3993,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_disk_monitor_mocks
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_disk_monitor_mocks
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_disk_monitor_mocks \
@@ -3010,12 +4040,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_file_handle_cache
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_file_handle_cache
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_file_handle_cache \
@@ -3044,12 +4087,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_gen_server2
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_gen_server2
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_gen_server2 \
@@ -3078,12 +4134,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_gm
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_gm
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_gm \
@@ -3112,12 +4181,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_log_config
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_log_config
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_log_config \
@@ -3146,12 +4228,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_log_management
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_log_management
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_log_management \
@@ -3180,12 +4275,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_operator_policy
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_operator_policy
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_operator_policy \
@@ -3214,12 +4322,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_pg_local
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_pg_local
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_pg_local \
@@ -3248,12 +4369,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_plugin_directories
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_plugin_directories
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_plugin_directories \
@@ -3282,12 +4416,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_plugin_versioning
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_plugin_versioning
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_plugin_versioning \
@@ -3316,12 +4463,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_policy_validators
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_policy_validators
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_policy_validators \
@@ -3350,12 +4510,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_priority_queue
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_priority_queue
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_priority_queue \
@@ -3384,12 +4557,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_queue_consumers
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_queue_consumers
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_queue_consumers \
@@ -3418,12 +4604,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_stats_and_metrics
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_stats_and_metrics
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_stats_and_metrics \
@@ -3452,12 +4651,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_supervisor2
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_supervisor2
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_supervisor2 \
@@ -3486,12 +4698,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-unit_vm_memory_monitor
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-unit_vm_memory_monitor
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-unit_vm_memory_monitor \
@@ -3520,12 +4745,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-upgrade_preparation
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-upgrade_preparation
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-upgrade_preparation \
@@ -3554,12 +4792,25 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbit-ct-vhost
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN ct-vhost
+      if: steps.cache.outputs.cache-hit != 'true'
       id: tests
       run: |
         make -C deps/rabbit ct-vhost \

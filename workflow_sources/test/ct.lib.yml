@@ -12,7 +12,19 @@ if: #@ skip_ci_condition()
 steps:
   - name: CHECKOUT REPOSITORY
     uses: actions/checkout@v2
+  - name: COMPUTE TEST RESULT CACHE KEY
+    id: analysis
+    run: |
+      tree_hash=$(git rev-parse HEAD:deps)
+      echo "::set-output name=test_result_cache_key::$tree_hash"
+  - name: FETCH TEST RESULT CACHE
+    id: cache
+    uses: actions/cache@v2
+    with:
+      path: test-result-cache/(@= dep.name @)-eunit
+      key: ${{ steps.analysis.outputs.test_result_cache_key }}
   - name: VALIDATE KNOWN CT SUITES
+    if: steps.cache.outputs.cache-hit != 'true'
     env:
       project: #@ dep.name
     #@ suite_names = [suite.name for suite in dep.suites]
@@ -20,11 +32,13 @@ steps:
     run: |
       ci/scripts/validate-workflow.sh (@= " ".join(suite_names) @)
   - name: CONFIGURE OTP & ELIXIR
+    if: steps.cache.outputs.cache-hit != 'true'
     uses: actions/setup-elixir@v1
     with:
       otp-version: #@ erlang_version
       elixir-version: #@ data.values.elixir_version
   - name: RUN EUNIT
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       make eunit \
         base_rmq_ref=(@= data.values.base_rmq_ref @) \
@@ -32,6 +46,8 @@ steps:
         FULL= \
         FAIL_FAST=1 \
         SKIP_AS_ERROR=1
+      mkdir -p test-result-cache
+      date > test-result-cache/(@= dep.name @)-eunit
 #@ end
 
 #@ def ct_suites_job(dep, suite_name, erlang_version=None):
@@ -45,12 +61,25 @@ if: #@ skip_ci_condition()
 steps:
   - name: CHECKOUT REPOSITORY
     uses: actions/checkout@v2
+  - name: COMPUTE TEST RESULT CACHE KEY
+    id: analysis
+    run: |
+      tree_hash=$(git rev-parse HEAD:deps)
+      echo "::set-output name=test_result_cache_key::$tree_hash"
+  - name: FETCH TEST RESULT CACHE
+    id: cache
+    uses: actions/cache@v2
+    with:
+      path: test-result-cache/(@= dep.name @)-ct-(@= suite_name @)
+      key: ${{ steps.analysis.outputs.test_result_cache_key }}
   - name: CONFIGURE OTP & ELIXIR
+    if: steps.cache.outputs.cache-hit != 'true'
     uses: actions/setup-elixir@v1
     with:
       otp-version: #@ erlang_version
       elixir-version: #@ data.values.elixir_version
   - name: #@ "RUN ct-" + suite_name
+    if: steps.cache.outputs.cache-hit != 'true'
     id: tests
     run: |
       make -C deps/(@= dep.name @) ct-(@= suite_name @) \
@@ -72,10 +101,12 @@ steps:
       path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
   #@ if erlang_version != "git":
   - name: DOWNLOAD SECONDARY UMBRELLAS ARCHIVE
+    if: steps.cache.outputs.cache-hit != 'true'
     uses: actions/download-artifact@v2
     with:
       name: secondary-umbrellas.tar.xz
   - name: UNPACK SECONDARY UMBRELLAS ARCHIVE
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       set -ex
       tar Jxf secondary-umbrellas.tar.xz
@@ -84,6 +115,7 @@ steps:
   #@   logs_dir = 'ct-{}-logs-{}'.format(suite_name, version)
   #@   step_id = "tests-{}".format(version.replace(".","_"))
   - name: #@ "RUN ct-{} [mixed {}]".format(suite_name, version)
+    if: steps.cache.outputs.cache-hit != 'true'
     id: #@ step_id
     run: |
       make -C deps/(@= dep.name @) distclean-ct ct-(@= suite_name @) \
@@ -108,5 +140,9 @@ steps:
       name: (@= dep.name @)-ct-(@= suite_name @)-logs-mixed-(@= version @)
       path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
   #@ end
+  - name: CACHE SUCCESSFUL TEST RESULT
+    run: |
+      mkdir -p test-result-cache
+      date > test-result-cache/(@= dep.name @)-ct-(@= suite_name @)
   #@ end
 #@ end
