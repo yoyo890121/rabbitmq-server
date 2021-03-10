@@ -29,20 +29,19 @@ steps:
         ldap-utils \
         slapd
   #@ end
-  #@ if getattr(dep, 'use_etcd', False):
-  - name: INSTALL etcd
+  #@ if getattr(dep, 'needs_daemonize', False):
+  - name: INSTALL daemonize
     run: |
       sudo apt-get install -y -V --fix-missing --no-install-recommends \
         daemonize
   #@ end
   #@ tests_cmd = " || ".join(["run_tests"] * getattr(dep, 'attempts', 1))
   #@ if getattr(dep, 'use_terraform', False):
-  - name: PREPARE TERRAFORM SECRETS
+  - name: RUN TESTS
     run: |
       echo "${{ secrets.TERRAFORM_SSH_KEY }}" > id_rsa_terraform
       echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > id_rsa_terraform.pub
-  - name: RUN TESTS
-    run: |
+
       function run_tests() {
         make -C deps/(@= dep.name @) tests \
           base_rmq_ref=(@= data.values.base_rmq_ref @) \

@@ -282,7 +282,7 @@ deps:
 
 - name: rabbitmq_peer_discovery_etcd
   skip_dialyzer: true
-  use_etcd: true
+  needs_daemonize: true
   suites:
   - name: config_schema
   - name: system

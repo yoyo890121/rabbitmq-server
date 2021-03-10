@@ -9256,12 +9256,11 @@ jobs:
       with:
         otp-version: "23.1"
         elixir-version: 1.10.4
-    - name: PREPARE TERRAFORM SECRETS
+    - name: RUN TESTS
       run: |
         echo "${{ secrets.TERRAFORM_SSH_KEY }}" > id_rsa_terraform
         echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > id_rsa_terraform.pub
-    - name: RUN TESTS
-      run: |
+
         function run_tests() {
           make -C deps/rabbitmq_peer_discovery_aws tests \
             base_rmq_ref=master \
@@ -9369,7 +9368,7 @@ jobs:
       with:
         otp-version: "23.1"
         elixir-version: 1.10.4
-    - name: INSTALL etcd
+    - name: INSTALL daemonize
       run: |
         sudo apt-get install -y -V --fix-missing --no-install-recommends \
           daemonize
