@@ -35,9 +35,10 @@ steps:
         PLUGINS='rabbitmq_federation rabbitmq_stomp'
   - name: RUN TESTS
     if: steps.cache.outputs.cache-hit != 'true'
+    #@ rabbitmq_version = data.values.base_rmq_ref.replace('master', '3.9.x').replace('.x', '.0')
     run: |
       make -C deps/(@= dep.name @) tests MIX_TEST_OPTS="--exclude test"
-      make -C deps/(@= dep.name @) tests
+      make -C deps/(@= dep.name @) tests RABBITMQ_VERSION="(@= rabbitmq_version @)"
   - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview

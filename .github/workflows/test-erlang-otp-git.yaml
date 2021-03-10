@@ -5480,7 +5480,7 @@ jobs:
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_cli tests MIX_TEST_OPTS="--exclude test"
-        make -C deps/rabbitmq_cli tests
+        make -C deps/rabbitmq_cli tests RABBITMQ_VERSION="3.9.0"
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
