@@ -8760,13 +8760,13 @@ jobs:
         elixir-version: 1.10.4
     - name: INSTALL slapd
       run: |
-        echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | debconf-set-selections && \
-        echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | debconf-set-selections && \
-        echo 'slapd    slapd/password2    password   rabbitmq' | debconf-set-selections && \
-        echo 'slapd    slapd/password1    password   rabbitmq' | debconf-set-selections && \
-        echo 'slapd    slapd/backend    select    HDB' | debconf-set-selections
+        echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | sudo debconf-set-selections && \
+        echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | sudo debconf-set-selections && \
+        echo 'slapd    slapd/password2    password   rabbitmq' | sudo debconf-set-selections && \
+        echo 'slapd    slapd/password1    password   rabbitmq' | sudo debconf-set-selections && \
+        echo 'slapd    slapd/backend    select    HDB' | sudo debconf-set-selections
 
-        apt-get install -y -V --fix-missing --no-install-recommends \
+        sudo apt-get install -y -V --fix-missing --no-install-recommends \
           ldap-utils \
           slapd
     - name: RUN TESTS
@@ -9371,7 +9371,7 @@ jobs:
         elixir-version: 1.10.4
     - name: INSTALL etcd
       run: |
-        apt-get install -y -V --fix-missing --no-install-recommends \
+        sudo apt-get install -y -V --fix-missing --no-install-recommends \
           daemonize
     - name: RUN TESTS
       run: |

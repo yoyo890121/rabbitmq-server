@@ -19,20 +19,20 @@ steps:
   #@ if getattr(dep, 'use_slapd', False):
   - name: INSTALL slapd
     run: |
-      echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | debconf-set-selections && \
-      echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | debconf-set-selections && \
-      echo 'slapd    slapd/password2    password   rabbitmq' | debconf-set-selections && \
-      echo 'slapd    slapd/password1    password   rabbitmq' | debconf-set-selections && \
-      echo 'slapd    slapd/backend    select    HDB' | debconf-set-selections
+      echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | sudo debconf-set-selections && \
+      echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | sudo debconf-set-selections && \
+      echo 'slapd    slapd/password2    password   rabbitmq' | sudo debconf-set-selections && \
+      echo 'slapd    slapd/password1    password   rabbitmq' | sudo debconf-set-selections && \
+      echo 'slapd    slapd/backend    select    HDB' | sudo debconf-set-selections
 
-      apt-get install -y -V --fix-missing --no-install-recommends \
+      sudo apt-get install -y -V --fix-missing --no-install-recommends \
         ldap-utils \
         slapd
   #@ end
   #@ if getattr(dep, 'use_etcd', False):
   - name: INSTALL etcd
     run: |
-      apt-get install -y -V --fix-missing --no-install-recommends \
+      sudo apt-get install -y -V --fix-missing --no-install-recommends \
         daemonize
   #@ end
   #@ tests_cmd = " || ".join(["run_tests"] * getattr(dep, 'attempts', 1))
