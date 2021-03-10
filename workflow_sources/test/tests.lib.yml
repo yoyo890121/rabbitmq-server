@@ -11,13 +11,26 @@ if: #@ skip_ci_condition()
 steps:
   - name: CHECKOUT REPOSITORY
     uses: actions/checkout@v2
+  - name: COMPUTE TEST RESULT CACHE KEY
+    id: analysis
+    run: |
+      tree_hash=$(git rev-parse HEAD:deps/(@= dep.name @))
+      echo "::set-output name=test_result_cache_key::$tree_hash"
+  - name: FETCH TEST RESULT CACHE
+    id: cache
+    uses: actions/cache@v2
+    with:
+      path: test-result-cache/(@= dep.name @)
+      key: ${{ steps.analysis.outputs.test_result_cache_key }}
   - name: CONFIGURE OTP & ELIXIR
+    if: steps.cache.outputs.cache-hit != 'true'
     uses: actions/setup-elixir@v1
     with:
       otp-version: #@ erlang_version
       elixir-version: #@ data.values.elixir_version
   #@ if getattr(dep, 'use_slapd', False):
   - name: INSTALL slapd
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | sudo debconf-set-selections && \
       echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | sudo debconf-set-selections && \
@@ -29,11 +42,10 @@ steps:
         debconf-utils \
         ldap-utils \
         slapd
-  - name: Setup tmate session
-    uses: mxschmitt/action-tmate@v3
   #@ end
   #@ if getattr(dep, 'needs_daemonize', False):
   - name: INSTALL daemonize
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       sudo apt-get install -y -V --fix-missing --no-install-recommends \
         daemonize
@@ -41,6 +53,7 @@ steps:
   #@ tests_cmd = " || ".join(["run_tests"] * getattr(dep, 'attempts', 1))
   #@ if getattr(dep, 'use_terraform', False):
   - name: RUN TESTS
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       echo "${{ secrets.TERRAFORM_SSH_KEY }}" > id_rsa_terraform
       echo "${{ secrets.TERRAFORM_SSH_KEY_PUB }}" > id_rsa_terraform.pub
@@ -58,6 +71,8 @@ steps:
           SSH_KEY=$PWD/id_rsa_terraform
       }
       (@= tests_cmd @)
+      mkdir -p test-result-cache
+      date > test-result-cache/(@= dep.name @)
   #@ else:
   - name: RUN TESTS
     run: |
@@ -70,6 +85,8 @@ steps:
           SKIP_AS_ERROR=1
       }
       (@= tests_cmd @)
+      mkdir -p test-result-cache
+      date > test-result-cache/(@= dep.name @)
   #@ end
   - name: ON FAILRUE ARCHIVE TESTS LOGS
     if: failure()
