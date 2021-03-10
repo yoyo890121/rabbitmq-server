@@ -11875,8 +11875,6 @@ jobs:
             SSH_KEY=$PWD/id_rsa_terraform
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_peer_discovery_aws
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |

@@ -77,8 +77,6 @@ steps:
           SSH_KEY=$PWD/id_rsa_terraform
       }
       (@= tests_cmd @)
-      mkdir -p test-result-cache
-      date > test-result-cache/(@= dep.name @)
   #@ else:
   - name: RUN TESTS
     if: steps.cache.outputs.cache-hit != 'true'
