@@ -3798,6 +3798,8 @@ jobs:
         sudo apt-get install -y -V --fix-missing --no-install-recommends \
           ldap-utils \
           slapd
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
     - name: RUN TESTS
       run: |
         function run_tests() {
