@@ -90,8 +90,6 @@ steps:
           SKIP_AS_ERROR=1
       }
       (@= tests_cmd @)
-      mkdir -p test-result-cache
-      date > test-result-cache/(@= dep.name @)
   #@ end
   - name: ON FAILRUE ARCHIVE TESTS LOGS
     if: failure()
@@ -104,4 +102,9 @@ steps:
     with:
       name: (@= dep.name @)-ct-logs
       path: "deps/(@= dep.name @)/*-ct-logs-*.tar.xz"
+  - name: CACHE SUCCESSFUL TEST RESULT
+    if: steps.cache.outputs.cache-hit != 'true'
+    run: |
+      mkdir -p test-result-cache
+      date > test-result-cache/(@= dep.name @)
 #@ end

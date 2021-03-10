@@ -46,231 +46,292 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/xref
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN XREF rabbit_common
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbit_common xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbit
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbit xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF amqp_client
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/amqp_client xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF amqp10_client
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/amqp10_client xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF amqp10_common
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/amqp10_common xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_amqp1_0
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_amqp1_0 xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_auth_backend_cache
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_auth_backend_cache xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_auth_backend_http
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_auth_backend_http xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_auth_backend_ldap
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_auth_backend_ldap xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_auth_backend_oauth2
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_auth_backend_oauth2 xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_auth_mechanism_ssl
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_auth_mechanism_ssl xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_aws
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_aws xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_cli
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_cli xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_consistent_hash_exchange
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_consistent_hash_exchange xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_event_exchange
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_event_exchange xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_federation
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_federation xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_federation_management
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_federation_management xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_jms_topic_exchange
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_jms_topic_exchange xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_management
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_management xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_management_agent
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_management_agent xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_mqtt
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_mqtt xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_peer_discovery_common
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_peer_discovery_common xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_peer_discovery_aws
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_peer_discovery_aws xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_peer_discovery_k8s
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_peer_discovery_k8s xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_peer_discovery_consul
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_peer_discovery_consul xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_peer_discovery_etcd
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_peer_discovery_etcd xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_prometheus
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_prometheus xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_random_exchange
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_random_exchange xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_recent_history_exchange
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_recent_history_exchange xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_sharding
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_sharding xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_shovel
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_shovel xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_shovel_management
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_shovel_management xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_stomp
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_stomp xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_stream
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_stream xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_stream_management
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_stream_management xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_stream_prometheus
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_stream_prometheus xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_top
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_top xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_tracing
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_tracing xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_trust_store
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_trust_store xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_web_dispatch
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_web_dispatch xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_web_mqtt
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_web_mqtt xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_web_mqtt_examples
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_web_mqtt_examples xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_web_stomp
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_web_stomp xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     - name: RUN XREF rabbitmq_web_stomp_examples
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_web_stomp_examples xref \
           base_rmq_ref=master \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/xref
   rabbit_common:
     name: rabbit_common
     needs:
@@ -309,8 +370,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbit_common
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -321,6 +380,11 @@ jobs:
       with:
         name: rabbit_common-ct-logs
         path: deps/rabbit_common/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbit_common
   rabbit-checks:
     name: rabbit-checks
     needs:
@@ -362,6 +426,9 @@ jobs:
           FULL= \
           FAIL_FAST=1 \
           SKIP_AS_ERROR=1
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
         mkdir -p test-result-cache
         date > test-result-cache/rabbit-eunit
   rabbit-ct-amqqueue_backward_compatibility:
@@ -4867,8 +4934,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/amqp_client
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -4879,6 +4944,11 @@ jobs:
       with:
         name: amqp_client-ct-logs
         path: deps/amqp_client/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/amqp_client
   amqp10_client:
     name: amqp10_client
     needs:
@@ -4917,8 +4987,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/amqp10_client
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -4929,6 +4997,11 @@ jobs:
       with:
         name: amqp10_client-ct-logs
         path: deps/amqp10_client/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/amqp10_client
   amqp10_common:
     name: amqp10_common
     needs:
@@ -4967,8 +5040,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/amqp10_common
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -4979,6 +5050,11 @@ jobs:
       with:
         name: amqp10_common-ct-logs
         path: deps/amqp10_common/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/amqp10_common
   rabbitmq_amqp1_0:
     name: rabbitmq_amqp1_0
     needs:
@@ -5017,8 +5093,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_amqp1_0
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5029,6 +5103,11 @@ jobs:
       with:
         name: rabbitmq_amqp1_0-ct-logs
         path: deps/rabbitmq_amqp1_0/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_amqp1_0
   rabbitmq_auth_backend_cache:
     name: rabbitmq_auth_backend_cache
     needs:
@@ -5067,8 +5146,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_auth_backend_cache
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5079,6 +5156,11 @@ jobs:
       with:
         name: rabbitmq_auth_backend_cache-ct-logs
         path: deps/rabbitmq_auth_backend_cache/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_auth_backend_cache
   rabbitmq_auth_backend_http:
     name: rabbitmq_auth_backend_http
     needs:
@@ -5117,8 +5199,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_auth_backend_http
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5129,6 +5209,11 @@ jobs:
       with:
         name: rabbitmq_auth_backend_http-ct-logs
         path: deps/rabbitmq_auth_backend_http/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_auth_backend_http
   rabbitmq_auth_backend_ldap:
     name: rabbitmq_auth_backend_ldap
     needs:
@@ -5184,8 +5269,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_auth_backend_ldap
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5196,6 +5279,11 @@ jobs:
       with:
         name: rabbitmq_auth_backend_ldap-ct-logs
         path: deps/rabbitmq_auth_backend_ldap/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_auth_backend_ldap
   rabbitmq_auth_backend_oauth2:
     name: rabbitmq_auth_backend_oauth2
     needs:
@@ -5234,8 +5322,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_auth_backend_oauth2
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5246,6 +5332,11 @@ jobs:
       with:
         name: rabbitmq_auth_backend_oauth2-ct-logs
         path: deps/rabbitmq_auth_backend_oauth2/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_auth_backend_oauth2
   rabbitmq_auth_mechanism_ssl:
     name: rabbitmq_auth_mechanism_ssl
     needs:
@@ -5284,8 +5375,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_auth_mechanism_ssl
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5296,6 +5385,11 @@ jobs:
       with:
         name: rabbitmq_auth_mechanism_ssl-ct-logs
         path: deps/rabbitmq_auth_mechanism_ssl/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_auth_mechanism_ssl
   rabbitmq_aws:
     name: rabbitmq_aws
     needs:
@@ -5334,8 +5428,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_aws
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5346,6 +5438,11 @@ jobs:
       with:
         name: rabbitmq_aws-ct-logs
         path: deps/rabbitmq_aws/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_aws
   rabbitmq_cli:
     name: rabbitmq_cli
     needs:
@@ -5355,16 +5452,30 @@ jobs:
     steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_cli)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/rabbitmq_cli
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: git
         elixir-version: 1.10.4
     - name: START BACKGROUND BROKER
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make start-background-broker \
           PLUGINS='rabbitmq_federation rabbitmq_stomp'
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_cli tests MIX_TEST_OPTS="--exclude test"
         make -C deps/rabbitmq_cli tests
@@ -5374,8 +5485,13 @@ jobs:
       with:
         name: rabbitmq_cli-broker-logs
         path: broker-logs/broker-logs.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_cli
     - name: STOP BACKGROUND BROKER
-      if: always()
+      if: steps.cache.outputs.cache-hit != 'true' && always()
       run: |
         make stop-node
   rabbitmq_consistent_hash_exchange:
@@ -5416,8 +5532,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_consistent_hash_exchange
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5428,6 +5542,11 @@ jobs:
       with:
         name: rabbitmq_consistent_hash_exchange-ct-logs
         path: deps/rabbitmq_consistent_hash_exchange/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_consistent_hash_exchange
   rabbitmq_event_exchange:
     name: rabbitmq_event_exchange
     needs:
@@ -5466,8 +5585,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_event_exchange
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5478,6 +5595,11 @@ jobs:
       with:
         name: rabbitmq_event_exchange-ct-logs
         path: deps/rabbitmq_event_exchange/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_event_exchange
   rabbitmq_federation:
     name: rabbitmq_federation
     needs:
@@ -5516,8 +5638,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests || run_tests || run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_federation
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5528,6 +5648,11 @@ jobs:
       with:
         name: rabbitmq_federation-ct-logs
         path: deps/rabbitmq_federation/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_federation
   rabbitmq_federation_management:
     name: rabbitmq_federation_management
     needs:
@@ -5566,8 +5691,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_federation_management
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5578,6 +5701,11 @@ jobs:
       with:
         name: rabbitmq_federation_management-ct-logs
         path: deps/rabbitmq_federation_management/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_federation_management
   rabbitmq_jms_topic_exchange:
     name: rabbitmq_jms_topic_exchange
     needs:
@@ -5616,8 +5744,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_jms_topic_exchange
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5628,6 +5754,11 @@ jobs:
       with:
         name: rabbitmq_jms_topic_exchange-ct-logs
         path: deps/rabbitmq_jms_topic_exchange/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_jms_topic_exchange
   rabbitmq_management:
     name: rabbitmq_management
     needs:
@@ -5666,8 +5797,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_management
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5678,6 +5807,11 @@ jobs:
       with:
         name: rabbitmq_management-ct-logs
         path: deps/rabbitmq_management/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_management
   rabbitmq_management_agent:
     name: rabbitmq_management_agent
     needs:
@@ -5716,8 +5850,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_management_agent
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5728,6 +5860,11 @@ jobs:
       with:
         name: rabbitmq_management_agent-ct-logs
         path: deps/rabbitmq_management_agent/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_management_agent
   rabbitmq_mqtt:
     name: rabbitmq_mqtt
     needs:
@@ -5766,8 +5903,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_mqtt
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5778,6 +5913,11 @@ jobs:
       with:
         name: rabbitmq_mqtt-ct-logs
         path: deps/rabbitmq_mqtt/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_mqtt
   rabbitmq_peer_discovery_common:
     name: rabbitmq_peer_discovery_common
     needs:
@@ -5816,8 +5956,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_peer_discovery_common
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5828,6 +5966,11 @@ jobs:
       with:
         name: rabbitmq_peer_discovery_common-ct-logs
         path: deps/rabbitmq_peer_discovery_common/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_peer_discovery_common
   rabbitmq_peer_discovery_aws:
     name: rabbitmq_peer_discovery_aws
     needs:
@@ -5885,6 +6028,11 @@ jobs:
       with:
         name: rabbitmq_peer_discovery_aws-ct-logs
         path: deps/rabbitmq_peer_discovery_aws/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_peer_discovery_aws
   rabbitmq_peer_discovery_k8s:
     name: rabbitmq_peer_discovery_k8s
     needs:
@@ -5923,8 +6071,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_peer_discovery_k8s
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5935,6 +6081,11 @@ jobs:
       with:
         name: rabbitmq_peer_discovery_k8s-ct-logs
         path: deps/rabbitmq_peer_discovery_k8s/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_peer_discovery_k8s
   rabbitmq_peer_discovery_consul:
     name: rabbitmq_peer_discovery_consul
     needs:
@@ -5973,8 +6124,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_peer_discovery_consul
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -5985,6 +6134,11 @@ jobs:
       with:
         name: rabbitmq_peer_discovery_consul-ct-logs
         path: deps/rabbitmq_peer_discovery_consul/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_peer_discovery_consul
   rabbitmq_peer_discovery_etcd:
     name: rabbitmq_peer_discovery_etcd
     needs:
@@ -6028,8 +6182,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_peer_discovery_etcd
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6040,6 +6192,11 @@ jobs:
       with:
         name: rabbitmq_peer_discovery_etcd-ct-logs
         path: deps/rabbitmq_peer_discovery_etcd/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_peer_discovery_etcd
   rabbitmq_prometheus:
     name: rabbitmq_prometheus
     needs:
@@ -6078,8 +6235,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_prometheus
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6090,6 +6245,11 @@ jobs:
       with:
         name: rabbitmq_prometheus-ct-logs
         path: deps/rabbitmq_prometheus/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_prometheus
   rabbitmq_random_exchange:
     name: rabbitmq_random_exchange
     needs:
@@ -6128,8 +6288,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_random_exchange
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6140,6 +6298,11 @@ jobs:
       with:
         name: rabbitmq_random_exchange-ct-logs
         path: deps/rabbitmq_random_exchange/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_random_exchange
   rabbitmq_recent_history_exchange:
     name: rabbitmq_recent_history_exchange
     needs:
@@ -6178,8 +6341,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_recent_history_exchange
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6190,6 +6351,11 @@ jobs:
       with:
         name: rabbitmq_recent_history_exchange-ct-logs
         path: deps/rabbitmq_recent_history_exchange/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_recent_history_exchange
   rabbitmq_sharding:
     name: rabbitmq_sharding
     needs:
@@ -6228,8 +6394,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_sharding
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6240,6 +6404,11 @@ jobs:
       with:
         name: rabbitmq_sharding-ct-logs
         path: deps/rabbitmq_sharding/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_sharding
   rabbitmq_shovel:
     name: rabbitmq_shovel
     needs:
@@ -6278,8 +6447,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_shovel
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6290,6 +6457,11 @@ jobs:
       with:
         name: rabbitmq_shovel-ct-logs
         path: deps/rabbitmq_shovel/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_shovel
   rabbitmq_shovel_management:
     name: rabbitmq_shovel_management
     needs:
@@ -6328,8 +6500,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_shovel_management
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6340,6 +6510,11 @@ jobs:
       with:
         name: rabbitmq_shovel_management-ct-logs
         path: deps/rabbitmq_shovel_management/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_shovel_management
   rabbitmq_stomp:
     name: rabbitmq_stomp
     needs:
@@ -6378,8 +6553,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_stomp
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6390,6 +6563,11 @@ jobs:
       with:
         name: rabbitmq_stomp-ct-logs
         path: deps/rabbitmq_stomp/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_stomp
   rabbitmq_stream:
     name: rabbitmq_stream
     needs:
@@ -6428,8 +6606,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_stream
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6440,6 +6616,11 @@ jobs:
       with:
         name: rabbitmq_stream-ct-logs
         path: deps/rabbitmq_stream/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_stream
   rabbitmq_stream_management:
     name: rabbitmq_stream_management
     needs:
@@ -6478,8 +6659,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_stream_management
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6490,6 +6669,11 @@ jobs:
       with:
         name: rabbitmq_stream_management-ct-logs
         path: deps/rabbitmq_stream_management/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_stream_management
   rabbitmq_stream_prometheus:
     name: rabbitmq_stream_prometheus
     needs:
@@ -6528,8 +6712,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_stream_prometheus
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6540,6 +6722,11 @@ jobs:
       with:
         name: rabbitmq_stream_prometheus-ct-logs
         path: deps/rabbitmq_stream_prometheus/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_stream_prometheus
   rabbitmq_top:
     name: rabbitmq_top
     needs:
@@ -6578,8 +6765,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_top
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6590,6 +6775,11 @@ jobs:
       with:
         name: rabbitmq_top-ct-logs
         path: deps/rabbitmq_top/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_top
   rabbitmq_tracing:
     name: rabbitmq_tracing
     needs:
@@ -6628,8 +6818,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_tracing
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6640,6 +6828,11 @@ jobs:
       with:
         name: rabbitmq_tracing-ct-logs
         path: deps/rabbitmq_tracing/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_tracing
   rabbitmq_trust_store:
     name: rabbitmq_trust_store
     needs:
@@ -6678,8 +6871,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_trust_store
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6690,6 +6881,11 @@ jobs:
       with:
         name: rabbitmq_trust_store-ct-logs
         path: deps/rabbitmq_trust_store/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_trust_store
   rabbitmq_web_dispatch:
     name: rabbitmq_web_dispatch
     needs:
@@ -6728,8 +6924,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_web_dispatch
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6740,6 +6934,11 @@ jobs:
       with:
         name: rabbitmq_web_dispatch-ct-logs
         path: deps/rabbitmq_web_dispatch/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_web_dispatch
   rabbitmq_web_mqtt:
     name: rabbitmq_web_mqtt
     needs:
@@ -6778,8 +6977,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_web_mqtt
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6790,6 +6987,11 @@ jobs:
       with:
         name: rabbitmq_web_mqtt-ct-logs
         path: deps/rabbitmq_web_mqtt/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_web_mqtt
   rabbitmq_web_mqtt_examples:
     name: rabbitmq_web_mqtt_examples
     needs:
@@ -6828,8 +7030,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_web_mqtt_examples
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6840,6 +7040,11 @@ jobs:
       with:
         name: rabbitmq_web_mqtt_examples-ct-logs
         path: deps/rabbitmq_web_mqtt_examples/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_web_mqtt_examples
   rabbitmq_web_stomp:
     name: rabbitmq_web_stomp
     needs:
@@ -6878,8 +7083,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_web_stomp
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6890,6 +7093,11 @@ jobs:
       with:
         name: rabbitmq_web_stomp-ct-logs
         path: deps/rabbitmq_web_stomp/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_web_stomp
   rabbitmq_web_stomp_examples:
     name: rabbitmq_web_stomp_examples
     needs:
@@ -6928,8 +7136,6 @@ jobs:
             SKIP_AS_ERROR=1
         }
         run_tests
-        mkdir -p test-result-cache
-        date > test-result-cache/rabbitmq_web_stomp_examples
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
@@ -6940,6 +7146,11 @@ jobs:
       with:
         name: rabbitmq_web_stomp_examples-ct-logs
         path: deps/rabbitmq_web_stomp_examples/*-ct-logs-*.tar.xz
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/rabbitmq_web_stomp_examples
   finish:
     name: finish
     needs:

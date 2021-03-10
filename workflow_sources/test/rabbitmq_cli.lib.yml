@@ -11,16 +11,30 @@ if: #@ skip_ci_condition()
 steps:
   - name: CHECKOUT REPOSITORY
     uses: actions/checkout@v2
+  - name: COMPUTE TEST RESULT CACHE KEY
+    id: analysis
+    run: |
+      tree_hash=$(git rev-parse HEAD:deps/(@= dep.name @))
+      echo "::set-output name=test_result_cache_key::$tree_hash"
+  - name: FETCH TEST RESULT CACHE
+    id: cache
+    uses: actions/cache@v2
+    with:
+      path: test-result-cache/(@= dep.name @)
+      key: ${{ steps.analysis.outputs.test_result_cache_key }}
   - name: CONFIGURE OTP & ELIXIR
+    if: steps.cache.outputs.cache-hit != 'true'
     uses: actions/setup-elixir@v1
     with:
       otp-version: #@ erlang_version
       elixir-version: #@ data.values.elixir_version
   - name: START BACKGROUND BROKER
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       make start-background-broker \
         PLUGINS='rabbitmq_federation rabbitmq_stomp'
   - name: RUN TESTS
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       make -C deps/(@= dep.name @) tests MIX_TEST_OPTS="--exclude test"
       make -C deps/(@= dep.name @) tests
@@ -31,8 +45,13 @@ steps:
     with:
       name: (@= dep.name @)-broker-logs
       path: "broker-logs/broker-logs.tar.xz"
+  - name: CACHE SUCCESSFUL TEST RESULT
+    if: steps.cache.outputs.cache-hit != 'true'
+    run: |
+      mkdir -p test-result-cache
+      date > test-result-cache/(@= dep.name @)
   - name: STOP BACKGROUND BROKER
-    if: always()
+    if: steps.cache.outputs.cache-hit != 'true' && always()
     run: |
       make stop-node
 #@ end

@@ -102,18 +102,36 @@ xref:
   steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/xref
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: #@ erlang_version
         elixir-version: #@ data.values.elixir_version
     #@ for dep in [d for d in data.values.deps if not getattr(d, "skip_xref", False)]:
     - name: RUN XREF (@= dep.name @)
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/(@= dep.name @) xref \
           base_rmq_ref=(@= data.values.base_rmq_ref @) \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
     #@ end
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/xref
 
 #@ if erlang_version != "git":
 dialyze:
@@ -127,18 +145,36 @@ dialyze:
   steps:
     - name: CHECKOUT REPOSITORY
       uses: actions/checkout@v2
+    - name: COMPUTE TEST RESULT CACHE KEY
+      id: analysis
+      run: |
+        tree_hash=$(git rev-parse HEAD:deps)
+        echo "::set-output name=test_result_cache_key::$tree_hash"
+    - name: FETCH TEST RESULT CACHE
+      id: cache
+      uses: actions/cache@v2
+      with:
+        path: test-result-cache/dialyze
+        key: ${{ steps.analysis.outputs.test_result_cache_key }}
     - name: CONFIGURE OTP & ELIXIR
+      if: steps.cache.outputs.cache-hit != 'true'
       uses: actions/setup-elixir@v1
       with:
         otp-version: #@ erlang_version
         elixir-version: #@ data.values.elixir_version
     #@ for dep in [d for d in data.values.deps if not getattr(d, "skip_dialyzer", False)]:
     - name: RUN DIALYZE (@= dep.name @)
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/(@= dep.name @) dialyze \
           base_rmq_ref=(@= data.values.base_rmq_ref @) \
           current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
           FULL=
     #@ end
+    - name: CACHE SUCCESSFUL TEST RESULT
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        mkdir -p test-result-cache
+        date > test-result-cache/dialyze
 #@ end
 #@ end
