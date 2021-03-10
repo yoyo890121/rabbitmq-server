@@ -298,6 +298,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbit_common tests \
@@ -3604,6 +3605,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/amqp_client tests \
@@ -3653,6 +3655,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/amqp10_client tests \
@@ -3702,6 +3705,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/amqp10_common tests \
@@ -3751,6 +3755,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_amqp1_0 tests \
@@ -3800,6 +3805,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_auth_backend_cache tests \
@@ -3849,6 +3855,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_auth_backend_http tests \
@@ -3900,17 +3907,22 @@ jobs:
     - name: INSTALL slapd
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
+        sudo apt-get update
+
+        sudo apt-get install -y -V --fix-missing --no-install-recommends \
+          debconf-utils
+
         echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | sudo debconf-set-selections && \
         echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | sudo debconf-set-selections && \
         echo 'slapd    slapd/password2    password   rabbitmq' | sudo debconf-set-selections && \
         echo 'slapd    slapd/password1    password   rabbitmq' | sudo debconf-set-selections && \
         echo 'slapd    slapd/backend    select    HDB' | sudo debconf-set-selections
 
-        sudo apt-get install -y -V --fix-missing \
-          debconf-utils \
+        sudo apt-get install -y -V --fix-missing --no-install-recommends \
           ldap-utils \
           slapd
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_auth_backend_ldap tests \
@@ -3960,6 +3972,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_auth_backend_oauth2 tests \
@@ -4009,6 +4022,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_auth_mechanism_ssl tests \
@@ -4058,6 +4072,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_aws tests \
@@ -4139,6 +4154,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_consistent_hash_exchange tests \
@@ -4188,6 +4204,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_event_exchange tests \
@@ -4237,6 +4254,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_federation tests \
@@ -4286,6 +4304,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_federation_management tests \
@@ -4335,6 +4354,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_jms_topic_exchange tests \
@@ -4384,6 +4404,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_management tests \
@@ -4433,6 +4454,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_management_agent tests \
@@ -4482,6 +4504,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_mqtt tests \
@@ -4531,6 +4554,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_peer_discovery_common tests \
@@ -4637,6 +4661,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_peer_discovery_k8s tests \
@@ -4686,6 +4711,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_peer_discovery_consul tests \
@@ -4740,6 +4766,7 @@ jobs:
         sudo apt-get install -y -V --fix-missing --no-install-recommends \
           daemonize
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_peer_discovery_etcd tests \
@@ -4789,6 +4816,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_prometheus tests \
@@ -4838,6 +4866,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_random_exchange tests \
@@ -4887,6 +4916,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_recent_history_exchange tests \
@@ -4936,6 +4966,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_sharding tests \
@@ -4985,6 +5016,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_shovel tests \
@@ -5034,6 +5066,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_shovel_management tests \
@@ -5083,6 +5116,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_stomp tests \
@@ -5132,6 +5166,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_stream tests \
@@ -5181,6 +5216,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_stream_management tests \
@@ -5230,6 +5266,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_stream_prometheus tests \
@@ -5279,6 +5316,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_top tests \
@@ -5328,6 +5366,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_tracing tests \
@@ -5377,6 +5416,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_trust_store tests \
@@ -5426,6 +5466,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_web_dispatch tests \
@@ -5475,6 +5516,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_web_mqtt tests \
@@ -5524,6 +5566,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_web_mqtt_examples tests \
@@ -5573,6 +5616,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_web_stomp tests \
@@ -5622,6 +5666,7 @@ jobs:
         otp-version: git
         elixir-version: 1.10.4
     - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
       run: |
         function run_tests() {
           make -C deps/rabbitmq_web_stomp_examples tests \

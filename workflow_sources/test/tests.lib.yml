@@ -32,14 +32,18 @@ steps:
   - name: INSTALL slapd
     if: steps.cache.outputs.cache-hit != 'true'
     run: |
+      sudo apt-get update
+
+      sudo apt-get install -y -V --fix-missing --no-install-recommends \
+        debconf-utils
+
       echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | sudo debconf-set-selections && \
       echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | sudo debconf-set-selections && \
       echo 'slapd    slapd/password2    password   rabbitmq' | sudo debconf-set-selections && \
       echo 'slapd    slapd/password1    password   rabbitmq' | sudo debconf-set-selections && \
       echo 'slapd    slapd/backend    select    HDB' | sudo debconf-set-selections
 
-      sudo apt-get install -y -V --fix-missing \
-        debconf-utils \
+      sudo apt-get install -y -V --fix-missing --no-install-recommends \
         ldap-utils \
         slapd
   #@ end
@@ -75,6 +79,7 @@ steps:
       date > test-result-cache/(@= dep.name @)
   #@ else:
   - name: RUN TESTS
+    if: steps.cache.outputs.cache-hit != 'true'
     run: |
       function run_tests() {
         make -C deps/(@= dep.name @) tests \
