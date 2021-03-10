@@ -3766,6 +3766,17 @@ jobs:
       with:
         otp-version: git
         elixir-version: 1.10.4
+    - name: INSTALL slapd
+      run: |
+        echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | debconf-set-selections && \
+        echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | debconf-set-selections && \
+        echo 'slapd    slapd/password2    password   rabbitmq' | debconf-set-selections && \
+        echo 'slapd    slapd/password1    password   rabbitmq' | debconf-set-selections && \
+        echo 'slapd    slapd/backend    select    HDB' | debconf-set-selections
+
+        apt-get install -y -V --fix-missing --no-install-recommends \
+          ldap-utils \
+          slapd
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_auth_backend_ldap tests \
@@ -4318,6 +4329,10 @@ jobs:
       with:
         otp-version: git
         elixir-version: 1.10.4
+    - name: INSTALL etcd
+      run: |
+        apt-get install -y -V --fix-missing --no-install-recommends \
+          daemonize
     - name: RUN TESTS
       run: |
         make -C deps/rabbitmq_peer_discovery_etcd tests \
@@ -5060,9 +5075,11 @@ jobs:
     if: '!contains(github.event.head_commit.message, ''[ci skip]'') && (success() || failure())'
     steps:
     - uses: technote-space/workflow-conclusion-action@v1
+    - uses: google-github-actions/setup-gcloud@master
+      with:
+        service_account_key: ${{ secrets.GCR_JSON_KEY }}
+        export_default_credentials: true
     - name: RECORD BUILD FINISH
       run: |
         echo -n "${{ env.WORKFLOW_CONCLUSION }}" > conclusion
-
-        gsutil cp conclusion \
-          'gs://monorepo_github_actions_conclusions/${{ github.sha }}/${{ github.workflow }}'
+        gsutil cp conclusion 'gs://monorepo_github_actions_conclusions/${{ github.sha }}/${{ github.workflow }}'

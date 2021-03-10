@@ -150,6 +150,7 @@ deps:
 
 - name: rabbitmq_auth_backend_ldap
   skip_dialyzer: true
+  use_slapd: true
   suites:
   - name: config_schema
   - name: system
@@ -280,6 +281,7 @@ deps:
 
 - name: rabbitmq_peer_discovery_etcd
   skip_dialyzer: true
+  use_etcd: true
   suites:
   - name: config_schema
   - name: system
