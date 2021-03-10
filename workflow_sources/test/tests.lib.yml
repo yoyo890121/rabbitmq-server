@@ -25,7 +25,8 @@ steps:
       echo 'slapd    slapd/password1    password   rabbitmq' | sudo debconf-set-selections && \
       echo 'slapd    slapd/backend    select    HDB' | sudo debconf-set-selections
 
-      sudo apt-get install -y -V --fix-missing --no-install-recommends \
+      sudo apt-get install -y -V --fix-missing \
+        debconf-utils \
         ldap-utils \
         slapd
   - name: Setup tmate session
