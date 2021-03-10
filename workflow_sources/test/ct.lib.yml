@@ -130,14 +130,12 @@ steps:
         SECONDARY_UMBRELLA_VERSION=$PWD/umbrellas/(@= version @) \
         RABBITMQ_FEATURE_FLAGS=
   - name: #@ 'ON FAILURE ARCHIVE TESTS LOGS [mixed {}]'.format(version)
-    if: failure() && steps.tests.outcome == 'failure'
+    if: failure() && steps.(@= step_id @).outcome == 'failure'
     run: |
       make -C deps/(@= dep.name @) ct-logs-archive
   - name: #@ 'ON FAILURE UPLOAD TESTS LOGS ARTIFACT [mixed {}]'.format(version)
     #! https://github.com/marketplace/actions/upload-artifact
     uses: actions/upload-artifact@v2-preview
-    #! For whatever reason, "if: steps.(@= suite @).outcome == 'failure'" never executes,
-    #! so just run always
     if: failure() && steps.(@= step_id @).outcome == 'failure'
     with:
       name: (@= dep.name @)-ct-(@= suite_name @)-logs-mixed-(@= version @)
