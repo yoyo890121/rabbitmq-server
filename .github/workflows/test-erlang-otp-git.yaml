@@ -5475,12 +5475,16 @@ jobs:
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make start-background-broker \
-          PLUGINS='rabbitmq_federation rabbitmq_stomp'
-    - name: RUN TESTS
+          PLUGINS='rabbitmq_federation rabbitmq_stomp' \
+          RABBITMQ_VERSION="3.9.0"
+    - name: COMPILE TESTS
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
         make -C deps/rabbitmq_cli tests MIX_TEST_OPTS="--exclude test"
-        make -C deps/rabbitmq_cli tests RABBITMQ_VERSION="3.9.0"
+    - name: RUN TESTS
+      if: steps.cache.outputs.cache-hit != 'true'
+      run: |
+        make -C deps/rabbitmq_cli tests
     - name: ON FAILURE UPLOAD TESTS LOGS ARTIFACT
       uses: actions/upload-artifact@v2-preview
       if: failure()
