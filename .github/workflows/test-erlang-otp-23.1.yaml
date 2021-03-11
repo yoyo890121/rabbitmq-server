@@ -11105,39 +11105,38 @@ jobs:
       with:
         otp-version: "23.1"
         elixir-version: 1.10.4
-    - name: INSTALL slapd
-      if: steps.cache.outputs.cache-hit != 'true'
-      run: |
-        sudo apt-get install -y -V --fix-missing --no-install-recommends \
-          debconf-utils
-
-        echo 'slapd    slapd/internal/generated_adminpw    password   rabbitmq' | sudo debconf-set-selections && \
-        echo 'slapd    slapd/internal/adminpw    password   rabbitmq' | sudo debconf-set-selections && \
-        echo 'slapd    slapd/password2    password   rabbitmq' | sudo debconf-set-selections && \
-        echo 'slapd    slapd/password1    password   rabbitmq' | sudo debconf-set-selections && \
-        echo 'slapd    slapd/backend    select    HDB' | sudo debconf-set-selections
-
-        sudo apt-get install -y -V --fix-missing --no-install-recommends \
-          ldap-utils \
-          netcat \
-          python-dev \
-          python-simplejson \
-          python3 \
-          slapd
-    - name: Setup tmate session
-      uses: mxschmitt/action-tmate@v3
+    - name: Set up QEMU
+      uses: docker/setup-qemu-action@v1
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v1
+    - name: Login to GCR
+      uses: docker/login-action@v1
+      with:
+        registry: eu.gcr.io
+        username: _json_key
+        password: ${{ secrets.GCR_JSON_KEY }}
+    - name: PREPARE BUILD IMAGE
+      uses: docker/build-push-action@v2
+      with:
+        load: true
+        file: ci/dockerfiles/ci
+        tags: eu.gcr.io/cf-rabbitmq-core/ci:erlang-23.1-rabbitmq-${{ github.sha }}
+        build-args: |
+          ERLANG_VERSION=23.1
+          GITHUB_RUN_ID=${{ github.run_id }}
+          GITHUB_SHA=${{ github.sha }}
+          base_rmq_ref=master
+          current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }}
+          RABBITMQ_VERSION=3.9.0
     - name: RUN TESTS
-      if: steps.cache.outputs.cache-hit != 'true'
       run: |
-        function run_tests() {
-          make -C deps/rabbitmq_auth_backend_ldap tests \
-            base_rmq_ref=master \
-            current_rmq_ref=${{ steps.ref.outputs.branch_or_tag_name }} \
-            FULL= \
-            FAIL_FAST=1 \
-            SKIP_AS_ERROR=1
-        }
-        run_tests
+        mkdir deps/rabbitmq_auth_backend_ldap/logs && chmod 777 deps/rabbitmq_auth_backend_ldap/logs
+        docker run \
+          --env project=rabbitmq_auth_backend_ldap \
+          --volume ${PWD}/deps/rabbitmq_auth_backend_ldap/logs:/workspace/ct-logs \
+          --oom-kill-disable \
+          eu.gcr.io/cf-rabbitmq-core/ci:erlang-23.1-rabbitmq-${{ github.sha }} \
+          ci/scripts/tests.sh
     - name: ON FAILRUE ARCHIVE TESTS LOGS
       if: failure()
       run: |
