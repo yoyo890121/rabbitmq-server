@@ -344,8 +344,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -4908,8 +4909,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/amqp_client)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/amqp_client)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -4961,8 +4963,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/amqp10_client)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/amqp10_client)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5014,8 +5017,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/amqp10_common)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/amqp10_common)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5067,8 +5071,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_amqp1_0)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_amqp1_0)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5120,8 +5125,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_cache)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_cache)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5173,8 +5179,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_http)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_http)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5226,8 +5233,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_ldap)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_ldap)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5300,8 +5308,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_oauth2)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_backend_oauth2)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5353,8 +5362,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_mechanism_ssl)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_auth_mechanism_ssl)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5406,8 +5416,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_aws)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_aws)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5517,8 +5528,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_consistent_hash_exchange)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_consistent_hash_exchange)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5570,8 +5582,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_event_exchange)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_event_exchange)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5623,8 +5636,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_federation)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_federation)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5676,8 +5690,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_federation_management)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_federation_management)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5729,8 +5744,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_jms_topic_exchange)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_jms_topic_exchange)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5782,8 +5798,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_management)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_management)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5835,8 +5852,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_management_agent)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_management_agent)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5888,8 +5906,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_mqtt)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_mqtt)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5941,8 +5960,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_common)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_common)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -5994,8 +6014,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_aws)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_aws)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6058,8 +6079,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_k8s)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_k8s)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6111,8 +6133,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_consul)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_consul)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6164,8 +6187,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_etcd)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_peer_discovery_etcd)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6222,8 +6246,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_prometheus)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_prometheus)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6275,8 +6300,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_random_exchange)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_random_exchange)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6328,8 +6354,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_recent_history_exchange)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_recent_history_exchange)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6381,8 +6408,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_sharding)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_sharding)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6434,8 +6462,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_shovel)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_shovel)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6487,8 +6516,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_shovel_management)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_shovel_management)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6540,8 +6570,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stomp)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stomp)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6593,8 +6624,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stream)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stream)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6646,8 +6678,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stream_management)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stream_management)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6699,8 +6732,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stream_prometheus)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_stream_prometheus)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6752,8 +6786,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_top)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_top)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6805,8 +6840,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_tracing)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_tracing)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6858,8 +6894,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_trust_store)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_trust_store)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6911,8 +6948,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_dispatch)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_dispatch)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -6964,8 +7002,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_mqtt)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_mqtt)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -7017,8 +7056,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_mqtt_examples)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_mqtt_examples)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -7070,8 +7110,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_stomp)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_stomp)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2
@@ -7123,8 +7164,9 @@ jobs:
     - name: COMPUTE TEST RESULT CACHE KEY
       id: analysis
       run: |
-        tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_stomp_examples)
-        echo "::set-output name=test_result_cache_key::$tree_hash"
+        common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+        dep_tree_hash=$(git rev-parse HEAD:deps/rabbitmq_web_stomp_examples)
+        echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
     - name: FETCH TEST RESULT CACHE
       id: cache
       uses: actions/cache@v2

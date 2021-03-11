@@ -14,8 +14,9 @@ steps:
   - name: COMPUTE TEST RESULT CACHE KEY
     id: analysis
     run: |
-      tree_hash=$(git rev-parse HEAD:deps/(@= dep.name @))
-      echo "::set-output name=test_result_cache_key::$tree_hash"
+      common_tree_hash=$(git rev-parse HEAD:deps/rabbit_common)
+      dep_tree_hash=$(git rev-parse HEAD:deps/(@= dep.name @))
+      echo "::set-output name=test_result_cache_key::${common_tree_hash}-${dep_tree_hash}"
   - name: FETCH TEST RESULT CACHE
     id: cache
     uses: actions/cache@v2
