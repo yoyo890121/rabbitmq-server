@@ -49,6 +49,8 @@ steps:
         python-simplejson \
         python3 \
         slapd
+  - name: Setup tmate session
+    uses: mxschmitt/action-tmate@v3
   #@ end
   #@ if getattr(dep, 'needs_daemonize', False):
   - name: INSTALL daemonize

@@ -11124,6 +11124,8 @@ jobs:
           python-simplejson \
           python3 \
           slapd
+    - name: Setup tmate session
+      uses: mxschmitt/action-tmate@v3
     - name: RUN TESTS
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
