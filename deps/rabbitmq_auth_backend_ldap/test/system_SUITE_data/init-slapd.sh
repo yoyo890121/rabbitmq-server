@@ -50,6 +50,8 @@ rootdn          "$binddn"
 rootpw          $passwd
 EOF
 
+chmod +r "$conf_file"
+
 cat "$conf_file"
 
 conf_dir=$slapd_data_dir/slapd.d
