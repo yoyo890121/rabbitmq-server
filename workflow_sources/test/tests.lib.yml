@@ -58,6 +58,10 @@ steps:
   #@ end
   #@ tests_cmd = " || ".join(["run_tests"] * getattr(dep, 'attempts', 1))
   #@ if getattr(dep, 'use_terraform', False):
+  - name: SETUP TERRAFORM
+    uses: hashicorp/setup-terraform@v1
+    with:
+      terraform_version: 0.12.24
   - name: RUN TESTS
     if: steps.cache.outputs.cache-hit != 'true'
     run: |

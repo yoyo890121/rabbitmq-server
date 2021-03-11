@@ -6006,6 +6006,10 @@ jobs:
       with:
         otp-version: git
         elixir-version: 1.10.4
+    - name: SETUP TERRAFORM
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: 0.12.24
     - name: RUN TESTS
       if: steps.cache.outputs.cache-hit != 'true'
       run: |
