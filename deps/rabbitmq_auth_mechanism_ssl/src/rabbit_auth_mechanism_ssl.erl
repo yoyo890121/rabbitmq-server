@@ -56,7 +56,7 @@ init(Sock) ->
                    nossl ->
                        {refused, none, "not a TLS-enabled connection", []}
                end,
-    rabbit_log:debug("auth mechanism TLS extracted username '~s' from peer certificate", [Username]),
+    _ = rabbit_log:debug("auth mechanism TLS extracted username '~s' from peer certificate", [Username]),
     #state{username = Username}.
 
 handle_response(_Response, #state{username = Username}) ->
