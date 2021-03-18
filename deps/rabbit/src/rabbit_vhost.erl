@@ -31,8 +31,11 @@ recover() ->
 
     rabbit_amqqueue:warn_file_limit(),
 
+    T0 = erlang:timestamp(),
     %% Prepare rabbit_semi_durable_route table
     rabbit_binding:recover(),
+    T1 = erlang:timestamp(),
+    rabbit_log:debug("rabbit_binding:recover/0 completed in: ~p µs", [timer:now_diff(T1, T0)]),
 
     %% rabbit_vhost_sup_sup will start the actual recovery.
     %% So recovery will be run every time a vhost supervisor is restarted.
@@ -51,7 +54,10 @@ recover(VHost) ->
     {Recovered, Failed} = rabbit_amqqueue:recover(VHost),
     AllQs = Recovered ++ Failed,
     QNames = [amqqueue:get_name(Q) || Q <- AllQs],
+    T0 = erlang:timestamp(),
     ok = rabbit_binding:recover(rabbit_exchange:recover(VHost), QNames),
+    T1 = erlang:timestamp(),
+    rabbit_log:debug("rabbit_binding:recover/1 for VHost ~p completed in: ~p µs", [VHost, timer:now_diff(T1, T0)]),
     ok = rabbit_amqqueue:start(Recovered),
     %% Start queue mirrors.
     ok = rabbit_mirror_queue_misc:on_vhost_up(VHost),
