@@ -57,7 +57,7 @@ recover(VHost) ->
     T0 = erlang:timestamp(),
     ok = rabbit_binding:recover(rabbit_exchange:recover(VHost), QNames),
     T1 = erlang:timestamp(),
-    rabbit_log:debug("rabbit_binding:recover/1 for VHost ~p completed in: ~p µs", [VHost, timer:now_diff(T1, T0)]),
+    rabbit_log:debug("rabbit_binding:recover/2 for VHost ~p completed in: ~p µs", [VHost, timer:now_diff(T1, T0)]),
     ok = rabbit_amqqueue:start(Recovered),
     %% Start queue mirrors.
     ok = rabbit_mirror_queue_misc:on_vhost_up(VHost),
