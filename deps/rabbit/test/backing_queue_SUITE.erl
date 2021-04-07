@@ -527,6 +527,9 @@ bq_queue_index(Config) ->
       ?MODULE, bq_queue_index1, [Config]).
 
 bq_queue_index1(_Config) ->
+    %% We must set the segment entry count in the process dictionary
+    %% for this test to work.
+    put(segment_entry_count, 1024),
     SegmentSize = rabbit_queue_index:next_segment_boundary(0),
     TwoSegs = SegmentSize + SegmentSize,
     MostOfASegment = trunc(SegmentSize*0.75),
@@ -708,6 +711,9 @@ bq_queue_recover(Config) ->
       ?MODULE, bq_queue_recover1, [Config]).
 
 bq_queue_recover1(Config) ->
+    %% We must set the segment entry count in the process dictionary
+    %% for this test to work.
+    put(segment_entry_count, 1024),
     Count = 2 * rabbit_queue_index:next_segment_boundary(0),
     QName0 = queue_name(Config, <<"bq_queue_recover-q">>),
     {new, Q} = rabbit_amqqueue:declare(QName0, true, false, [], none, <<"acting-user">>),
