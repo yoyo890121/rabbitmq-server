@@ -27,6 +27,8 @@
 
 -define(MAGIC, 16#524D5149). %% "RMQI"
 -define(VERSION, 1).
+-define(HEADER_SIZE, 64). %% bytes
+-define(ENTRY_SIZE,  32). %% bytes
 
 -include_lib("rabbit_common/include/rabbit.hrl").
 -include_lib("kernel/include/file.hrl").
@@ -151,9 +153,6 @@ ensure_queue_name_stub_file(#resource{virtual_host = VHost, name = QName}, Dir) 
     file:write_file(QueueNameFile, <<"VHOST: ", VHost/binary, "\n",
                                      "QUEUE: ", QName/binary, "\n">>).
 
-%% @todo We should open the WriteFd and write the file header if it's not there already (new file).
-%% @todo When creating a file we prefill it with 0s.
-
 open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
     %% We only use 'read' here so the file doesn't get truncated.
     {ok, Fd} = file:open(segment_file(WriteMarker, State), [read, write, raw]),
@@ -175,7 +174,7 @@ open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
             %% We don't worry about failure here because an error
             %% is returned when the system doesn't support this feature.
             %% The index will simply be less efficient in that case.
-            _ = file:allocate(Fd, 0, 64 + SegmentEntryCount * 32),
+            _ = file:allocate(Fd, 0, ?HEADER_SIZE + SegmentEntryCount * ?ENTRY_SIZE),
             %% We then write the segment file header. It contains
             %% some useful info and some reserved bytes for future use.
             %% We currently do not make use of this information. It is
@@ -194,21 +193,19 @@ open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
     %% All good.
     State#mqistate{ write_fd = Fd }.
 
-%%    %% The file header is 64 bytes (equivalent to 2 entries).
-%%    Header = << ?MAGIC:32,    %% Magic number.
-%%                ?VERSION:8,   %% File format version.
-%%                FromSeqId:64, %% First SeqId that can be found in this file (if non-empty).
-%%                ToSeqId:64,   %% Last SeqId that can be found in this file (if full).
-%%                0:344 >>      %% Reserved.
-
 -spec reset_state(State) -> State when State::mqistate().
 
-reset_state(#mqistate{ queue_name  = Name,
-                       dir         = Dir,
-                       on_sync     = OnSyncFun,
-                       on_sync_msg = OnSyncMsgFun }) ->
+reset_state(#mqistate{ queue_name     = Name,
+                       dir            = Dir,
+                       write_fd       = WriteFd,
+                       read_write_fds = OpenFds,
+                       on_sync        = OnSyncFun,
+                       on_sync_msg    = OnSyncMsgFun }) ->
     %% Close all FDs.
-    %% @todo
+    ok = file:close(WriteFd),
+    _ = maps:map(fun(_, Fd) ->
+        ok = file:close(Fd)
+    end, undefined, OpenFds),
     %% Erase the data on disk.
     ok = erase_index_dir(Dir),
     %% Init again.
@@ -287,16 +284,21 @@ recover_sync_with_msg_store(_ContainsCheckFun, _State) ->
 -spec terminate(rabbit_types:vhost(), [any()], State) -> State when State::mqistate().
 
 terminate(VHost, Terms, State = #mqistate { dir = Dir,
+                                            write_fd = WriteFd,
+                                            read_write_fds = OpenFds,
                                             oldest_segment = Oldest,
                                             newest_segment = Newest }) ->
-    %% Fsync FDs open for writing.
-    %% @todo
-    %% Close all FDs.
-    %% @todo
+    %% Fsync and close all FDs.
+    ok = file:sync(WriteFd),
+    ok = file:close(WriteFd),
+    _ = maps:map(fun(_, Fd) ->
+        ok = file:sync(Fd),
+        ok = file:close(Fd)
+    end, undefined, OpenFds),
     %% Write recovery terms for faster recovery.
     rabbit_recovery_terms:store(VHost, filename:basename(Dir),
                                 [{mqi_segments, {Oldest, Newest}} | Terms]),
-    State. %% @todo Remove FDs from the state.
+    State#mqistate{ write_fd = WriteFd, read_write_fds = #{} }.
 
 -spec delete_and_terminate(State) -> State when State::mqistate().
 
@@ -518,7 +520,7 @@ read_from_disk(SeqIdsToRead0, State0, Acc0) ->
     %% next loop.
     {LastSeqId, SeqIdsToRead} = highest_continuous_seq_id(SeqIdsToRead0,
                                                           next_segment_boundary(FirstSeqId)),
-    ReadSize = (LastSeqId - FirstSeqId + 1) * 32,
+    ReadSize = (LastSeqId - FirstSeqId + 1) * ?ENTRY_SIZE,
     {Fd, OffsetForSeqId, State} = get_fd(FirstSeqId, State0),
     {ok, _} = file:position(Fd, OffsetForSeqId),
     {ok, EntriesBin} = file:read(Fd, ReadSize),
@@ -530,7 +532,7 @@ read_from_disk(SeqIdsToRead0, State0, Acc0) ->
 get_fd(SeqId, State = #mqistate{ read_write_fds = OpenFds }) ->
     SegmentEntryCount = segment_entry_count(),
     Segment = SeqId div SegmentEntryCount,
-    Offset = 64 + (SeqId rem SegmentEntryCount) * 32,
+    Offset = ?HEADER_SIZE + (SeqId rem SegmentEntryCount) * ?ENTRY_SIZE,
     case OpenFds of
         #{ Segment := Fd } ->
             {Fd, Offset, State};
