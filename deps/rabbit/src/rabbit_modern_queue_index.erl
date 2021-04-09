@@ -333,13 +333,13 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
         undefined -> 0;
         _ -> Expiry0
     end,
-    Entry = << 0:8,          %% ACK.
-               0:8,          %% Deliver.
-               Flags:8,      %% IsPersistent flag (least significant bit).
-               0:8,          %% Reserved. Makes entries 32B in size to match page alignment on disk.
-               Id:16/binary, %% Message store ID.
-               Size:32,      %% Message payload size.
-               Expiry:64 >>, %% Expiration time.
+    Entry = << 0:8,                   %% ACK.
+               0:8,                   %% Deliver.
+               Flags:8,               %% IsPersistent flag (least significant bit).
+               0:8,                   %% Reserved. Makes entries 32B in size to match page alignment on disk.
+               Id:16/binary,          %% Message store ID.
+               Size:32/unsigned,      %% Message payload size.
+               Expiry:64/unsigned >>, %% Expiration time.
     ok = file:write(WriteFd, Entry),
     %% @todo When the write_marker has reached the boundary we must
     %%       close this file and open the next.
@@ -550,8 +550,8 @@ parse_entries(<< IsAcked:8,
                  _:7, IsPersistent:1,
                  _:8,
                  Id0:128,
-                 Size:32,
-                 Expiry0:64,
+                 Size:32/unsigned,
+                 Expiry0:64/unsigned,
                  Rest/bits >>, SeqId, Acc) ->
     %% We skip entries that have already been acked. This may only
     %% happen when we recover from a dirty shutdown.
