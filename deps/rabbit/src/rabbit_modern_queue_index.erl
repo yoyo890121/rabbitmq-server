@@ -195,20 +195,11 @@ open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
 
 -spec reset_state(State) -> State when State::mqistate().
 
-reset_state(#mqistate{ queue_name     = Name,
-                       dir            = Dir,
-                       write_fd       = WriteFd,
-                       read_write_fds = OpenFds,
-                       on_sync        = OnSyncFun,
-                       on_sync_msg    = OnSyncMsgFun }) ->
-    %% Close all FDs.
-    ok = file:close(WriteFd),
-    _ = maps:map(fun(_, Fd) ->
-        ok = file:close(Fd)
-    end, undefined, OpenFds),
-    %% Erase the data on disk.
-    ok = erase_index_dir(Dir),
-    %% Init again.
+reset_state(State = #mqistate{ queue_name     = Name,
+                               dir            = Dir,
+                               on_sync        = OnSyncFun,
+                               on_sync_msg    = OnSyncMsgFun }) ->
+    delete_and_terminate(State),
     init1(Name, Dir, OnSyncFun, OnSyncMsgFun).
 
 -spec recover(rabbit_amqqueue:name(), shutdown_terms(), boolean(),
@@ -298,16 +289,21 @@ terminate(VHost, Terms, State = #mqistate { dir = Dir,
     %% Write recovery terms for faster recovery.
     rabbit_recovery_terms:store(VHost, filename:basename(Dir),
                                 [{mqi_segments, {Oldest, Newest}} | Terms]),
-    State#mqistate{ write_fd = WriteFd, read_write_fds = #{} }.
+    State#mqistate{ write_fd = undefined, read_write_fds = #{} }.
 
 -spec delete_and_terminate(State) -> State when State::mqistate().
 
-delete_and_terminate(State = #mqistate { dir = Dir }) ->
+delete_and_terminate(State = #mqistate { dir = Dir,
+                                         write_fd = WriteFd,
+                                         read_write_fds = OpenFds }) ->
     %% Close all FDs.
-    %% @todo
+    ok = file:close(WriteFd),
+    _ = maps:map(fun(_, Fd) ->
+        ok = file:close(Fd)
+    end, undefined, OpenFds),
     %% Erase the data on disk.
     ok = erase_index_dir(Dir),
-    State. %% @todo Remove FDs from the state.
+    State#mqistate{ write_fd = undefined, read_write_fds = #{} }.
 
 -spec publish(rabbit_types:msg_id(), seq_id(),
                     rabbit_types:message_properties(), boolean(),
