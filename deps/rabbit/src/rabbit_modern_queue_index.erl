@@ -25,7 +25,11 @@
 -define(QUEUE_NAME_STUB_FILE, ".queue_name").
 -define(SEGMENT_EXTENSION, ".midx").
 
+-define(MAGIC, 16#524D5149). %% "RMQI"
+-define(VERSION, 1).
+
 -include_lib("rabbit_common/include/rabbit.hrl").
+-include_lib("kernel/include/file.hrl").
 
 -type seq_id() :: non_neg_integer().
 %% @todo Use a shared seq_id() type in all relevant modules.
@@ -135,7 +139,7 @@ init(#resource{ virtual_host = VHost } = Name, OnSyncFun, OnSyncMsgFun) ->
 
 init1(Name, Dir, OnSyncFun, OnSyncMsgFun) ->
     ensure_queue_name_stub_file(Name, Dir),
-    open_write_file(#mqistate{
+    open_write_file(new, #mqistate{
         queue_name = Name,
         dir = Dir,
         on_sync = OnSyncFun,
@@ -150,9 +154,45 @@ ensure_queue_name_stub_file(#resource{virtual_host = VHost, name = QName}, Dir) 
 %% @todo We should open the WriteFd and write the file header if it's not there already (new file).
 %% @todo When creating a file we prefill it with 0s.
 
-open_write_file(State) ->
-    %% @todo
-    State.
+open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
+    %% We only use 'read' here so the file doesn't get truncated.
+    {ok, Fd} = file:open(segment_file(WriteMarker, State), [read, write, raw]),
+    %% When we are recovering from a shutdown we may need to check
+    %% whether the file already has content. If it does, we do
+    %% nothing. Otherwise, as well as in the normal case, we
+    %% pre-allocate the file size and write in the file header.
+    IsNewFile = case Reason of
+        new ->
+            true;
+        recover ->
+            {ok, #file_info{ size = Size }} = file:read_file_info(Fd),
+            Size =:= 0
+    end,
+    case IsNewFile of
+        true ->
+            SegmentEntryCount = segment_entry_count(),
+            %% We preallocate space for the file when possible.
+            %% We don't worry about failure here because an error
+            %% is returned when the system doesn't support this feature.
+            %% The index will simply be less efficient in that case.
+            _ = file:allocate(Fd, 0, 64 + SegmentEntryCount * 32),
+            %% We then write the segment file header. It contains
+            %% some useful info and some reserved bytes for future use.
+            %% We currently do not make use of this information. It is
+            %% only there for forward compatibility purposes (for example
+            %% to support an index with mixed segment_entry_count() values).
+            FromSeqId = (WriteMarker div SegmentEntryCount) * SegmentEntryCount,
+            ToSeqId = FromSeqId + SegmentEntryCount,
+            ok = file:write(Fd, << ?MAGIC:32,
+                                   ?VERSION:8,
+                                   FromSeqId:64/unsigned,
+                                   ToSeqId:64/unsigned,
+                                   0:344 >>);
+        false ->
+            ok
+    end,
+    %% All good.
+    State#mqistate{ write_fd = Fd }.
 
 %%    %% The file header is 64 bytes (equivalent to 2 entries).
 %%    Header = << ?MAGIC:32,    %% Magic number.
@@ -221,7 +261,7 @@ recover(#resource{ virtual_host = VHost } = Name, Terms, MsgStoreRecovered,
     %% interspersed because of this skip mechanism.
     State = State2#mqistate{ read_marker = Oldest * segment_entry_count() },
     %% We can now open the write file and return.
-    {Count, Bytes, open_write_file(State)}.
+    {Count, Bytes, open_write_file(recover, State)}.
 
 %% This function will not play nice if there are non-integers
 %% file names with the same extension as segment files.
@@ -386,7 +426,7 @@ delete_segments(Segment, LastSegment, State) ->
 %% a write file. The writer closes the file as soon as it reaches
 %% the maximum number of entries.
 
-delete_segment(Segment, State0 = #mqistate{ dir = Dir, read_write_fds = OpenFds0 }) ->
+delete_segment(Segment, State0 = #mqistate{ read_write_fds = OpenFds0 }) ->
     %% We close the open fd if any.
     State = case maps:take(Segment, OpenFds0) of
         {Fd, OpenFds} ->
@@ -396,8 +436,7 @@ delete_segment(Segment, State0 = #mqistate{ dir = Dir, read_write_fds = OpenFds0
             State0
     end,
     %% Then we can delete the segment file.
-    Path = filename:join(Dir, integer_to_list(Segment) ++ ?SEGMENT_EXTENSION),
-    ok = file:delete(Path),
+    ok = file:delete(segment_file(Segment, State)),
     State.
 
 %% A better interface for read/3 would be to request a maximum
@@ -488,7 +527,7 @@ read_from_disk(SeqIdsToRead0, State0, Acc0) ->
     Acc = parse_entries(EntriesBin, FirstSeqId, Acc0),
     read_from_disk(SeqIdsToRead, State, Acc).
 
-get_fd(SeqId, State = #mqistate{ dir = Dir, read_write_fds = OpenFds }) ->
+get_fd(SeqId, State = #mqistate{ read_write_fds = OpenFds }) ->
     SegmentEntryCount = segment_entry_count(),
     Segment = SeqId div SegmentEntryCount,
     Offset = 64 + (SeqId rem SegmentEntryCount) * 32,
@@ -496,8 +535,7 @@ get_fd(SeqId, State = #mqistate{ dir = Dir, read_write_fds = OpenFds }) ->
         #{ Segment := Fd } ->
             {Fd, Offset, State};
         _ ->
-            Path = filename:join(Dir, integer_to_list(Segment) ++ ?SEGMENT_EXTENSION),
-            {ok, Fd} = file:open(Path, [read, write, raw, binary]),
+            {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw, binary]),
             {Fd, Offset, State#mqistate{ read_write_fds = OpenFds#{ Segment => Fd }}}
     end.
 
@@ -631,6 +669,9 @@ queue_name_to_dir_name(#resource { kind = queue,
                                    name = QName }) ->
     <<Num:128>> = erlang:md5(<<"queue", VHost/binary, QName/binary>>),
     rabbit_misc:format("~.36B", [Num]).
+
+segment_file(Segment, #mqistate{ dir = Dir }) ->
+    filename:join(Dir, integer_to_list(Segment) ++ ?SEGMENT_EXTENSION).
 
 highest_continuous_seq_id([SeqId1, SeqId2|Tail])
         when (1 + SeqId1) =:= SeqId2 ->
