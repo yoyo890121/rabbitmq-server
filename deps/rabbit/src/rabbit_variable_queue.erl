@@ -709,6 +709,7 @@ ack([SeqId], State) ->
          State1 = #vqstate { index_state       = IndexState,
                              msg_store_clients = MSCState,
                              ack_out_counter   = AckOutCount }} ->
+            %% @todo With modern queue index we ALWAYs want to :ack.
             IndexState1 = case IndexOnDisk of
                               true  -> rabbit_queue_index:ack([SeqId], IndexState);
                               false -> IndexState
@@ -722,6 +723,7 @@ ack([SeqId], State) ->
                                  ack_out_counter  = AckOutCount + 1 })}
     end;
 ack(AckTags, State) ->
+    %% @todo With modern queue index we ALWAYs want to :ack.
     {{IndexOnDiskSeqIds, MsgIdsByStore, AllMsgIds},
      State1 = #vqstate { index_state       = IndexState,
                          msg_store_clients = MSCState,
@@ -1294,6 +1296,7 @@ msg_store_close_fds_fun(IsPersistent) ->
             State #vqstate { msg_store_clients = MSCState1 }
     end.
 
+%% @todo With modern index we always want to write on disk.
 maybe_write_delivered(false, _SeqId, IndexState) ->
     IndexState;
 maybe_write_delivered(true, SeqId, IndexState) ->
@@ -1821,6 +1824,7 @@ publish1(Msg = #basic_message { is_persistent = IsPersistent, id = MsgId },
                             unconfirmed         = UC }) ->
     IsPersistent1 = IsDurable andalso IsPersistent,
     MsgStatus = msg_status(IsPersistent1, IsDelivered, SeqId, Msg, MsgProps, IndexMaxSize),
+    %% @todo With modern queue we WANT to store the index on disk.
     {MsgStatus1, State1} = PersistFun(false, false, MsgStatus, State),
     State2 = case ?QUEUE:is_empty(Q3) of
                  false -> State1 #vqstate { q1 = ?QUEUE:in(m(MsgStatus1), Q1) };
@@ -1844,6 +1848,7 @@ publish1(Msg = #basic_message { is_persistent = IsPersistent, id = MsgId },
                                 delta               = Delta}) ->
     IsPersistent1 = IsDurable andalso IsPersistent,
     MsgStatus = msg_status(IsPersistent1, IsDelivered, SeqId, Msg, MsgProps, IndexMaxSize),
+    %% @todo With modern queue we WANT to store the index on disk.
     {MsgStatus1, State1} = PersistFun(true, true, MsgStatus, State),
     Delta1 = expand_delta(SeqId, Delta, IsPersistent),
     UC1 = gb_sets_maybe_insert(NeedsConfirming, MsgId, UC),
@@ -1871,6 +1876,7 @@ publish_delivered1(Msg = #basic_message { is_persistent = IsPersistent,
                                       unconfirmed         = UC }) ->
     IsPersistent1 = IsDurable andalso IsPersistent,
     MsgStatus = msg_status(IsPersistent1, true, SeqId, Msg, MsgProps, IndexMaxSize),
+    %% @todo With modern queue we WANT to store the index on disk.
     {MsgStatus1, State1} = PersistFun(false, false, MsgStatus, State),
     State2 = record_pending_ack(m(MsgStatus1), State1),
     UC1 = gb_sets_maybe_insert(NeedsConfirming, MsgId, UC),
@@ -1894,6 +1900,7 @@ publish_delivered1(Msg = #basic_message { is_persistent = IsPersistent,
                                       unconfirmed         = UC }) ->
     IsPersistent1 = IsDurable andalso IsPersistent,
     MsgStatus = msg_status(IsPersistent1, true, SeqId, Msg, MsgProps, IndexMaxSize),
+    %% @todo With modern queue we WANT to store the index on disk.
     {MsgStatus1, State1} = PersistFun(true, true, MsgStatus, State),
     State2 = record_pending_ack(m(MsgStatus1), State1),
     UC1 = gb_sets_maybe_insert(NeedsConfirming, MsgId, UC),

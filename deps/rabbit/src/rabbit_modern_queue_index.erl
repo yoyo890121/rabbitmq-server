@@ -309,14 +309,18 @@ delete_and_terminate(State = #mqistate { dir = Dir,
                     rabbit_types:message_properties(), boolean(),
                     non_neg_integer(), State) -> State when State::mqistate().
 
+publish(_, SeqId, _, _, _, State = #mqistate { write_marker = WriteMarker,
+                                               in_transit = InTransit })
+        when SeqId < WriteMarker ->
+    %% We have already written this message on disk. We do not need
+    %% to write it again. We may instead remove it from the in_transit list.
+    %% @todo Confirm that this is indeed the behavior we should have.
+    %% @todo It would be better to have a separate function for this...
+    State#mqistate{ in_transit = InTransit -- [SeqId] };
 publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
         State = #mqistate { write_marker = WriteMarker,
-                            write_fd = WriteFd }) ->
-    %% Assert that the SeqId corresponds to the write_marker.
-    %% We only write messages to disk once.
-    %% @todo Remove when the code is stable.
-    %% @todo We probably need two clauses: one when SeqId==WriteMarker, one when not (remove from in_transit).
-    WriteMarker = SeqId,
+                            write_fd = WriteFd })
+        when SeqId =:= WriteMarker ->
     %% Prepare the entry to be written.
     Id = case MsgOrId of
         #basic_message{id = Id0} -> Id0;
@@ -339,9 +343,23 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
                Size:32/unsigned,      %% Message payload size.
                Expiry:64/unsigned >>, %% Expiration time.
     ok = file:write(WriteFd, Entry),
-    %% @todo When the write_marker has reached the boundary we must
-    %%       close this file and open the next.
-    State#mqistate{ write_marker = WriteMarker + 1 }.
+    NextWriteMarker = WriteMarker + 1,
+    %% When the write_marker ends up on a new segment we must
+    %% sync, close this file and open the next. We sync here
+    %% because we want to avoid having two partially written
+    %% segment files in case of dirty shutdowns.
+    SegmentEntryCount = segment_entry_count(),
+    ThisSegment = WriteMarker div SegmentEntryCount,
+    NextSegment = NextWriteMarker div SegmentEntryCount,
+    case ThisSegment =:= NextSegment of
+        true ->
+            State#mqistate{ write_marker = NextWriteMarker };
+        false ->
+            ok = file:sync(WriteFd),
+            ok = file:close(WriteFd),
+            open_write_file(new, State#mqistate{ write_marker = NextWriteMarker,
+                                                 write_fd = undefined })
+    end.
 
 %% When marking delivers we only need to update the file(s) on disk.
 
