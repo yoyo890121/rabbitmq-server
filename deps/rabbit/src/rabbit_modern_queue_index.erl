@@ -311,13 +311,19 @@ delete_and_terminate(State = #mqistate { dir = Dir,
                     non_neg_integer(), State) -> State when State::mqistate().
 
 publish(_, SeqId, _, _, _, State = #mqistate { write_marker = WriteMarker,
+                                               read_marker = ReadMarker0,
                                                in_transit = InTransit })
         when SeqId < WriteMarker ->
     %% We have already written this message on disk. We do not need
     %% to write it again. We may instead remove it from the in_transit list.
     %% @todo Confirm that this is indeed the behavior we should have.
     %% @todo It would be better to have a separate function for this...
-    State#mqistate{ in_transit = InTransit -- [SeqId] };
+    ReadMarker = if
+        SeqId < ReadMarker0 -> SeqId;
+        true -> ReadMarker0
+    end,
+    State#mqistate{ read_marker = ReadMarker,
+                    in_transit = InTransit -- [SeqId] };
 publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
         State = #mqistate { write_marker = WriteMarker,
                             write_fd = WriteFd })
@@ -505,20 +511,24 @@ read(FromSeqId, ToSeqId, State) ->
 read(_, State = #mqistate{ write_marker = WriteMarker, read_marker = ReadMarker })
         when WriteMarker =:= ReadMarker ->
     {[], State};
-read(Num, State = #mqistate{ write_marker = WriteMarker, read_marker = ReadMarker,
-                              in_transit = InTransit, acks = Acks  }) ->
+read(Num, State0 = #mqistate{ write_marker = WriteMarker, read_marker = ReadMarker,
+                              in_transit = InTransit0, acks = Acks  }) ->
     %% The first message is always readable. It cannot be acked
     %% because if it was, the ack_marker would advance, and the
     %% read_marker would advance as well. It cannot be in_transit,
     %% because if it was, the read_marker would advance to reflect
     %% that as well.
     {NextReadMarker, SeqIdsToRead0} = prepare_read(Num - 1, WriteMarker,
-                                                   ReadMarker + 1, InTransit,
+                                                   ReadMarker + 1, InTransit0,
                                                    Acks, []),
     SeqIdsToRead = [ReadMarker|SeqIdsToRead0],
-    read_from_disk(SeqIdsToRead,
-                   State#mqistate{ read_marker = NextReadMarker },
-                   []).
+    {Reads, State} = read_from_disk(SeqIdsToRead,
+                                    State0#mqistate{ read_marker = NextReadMarker },
+                                    []),
+    %% We add the messages that have been read to the in_transit list.
+    InTransit = lists:foldl(fun({_, SeqId, _, _, _}, Acc) -> [SeqId|Acc] end,
+                            InTransit0, Reads),
+    {Reads, State#mqistate{ in_transit = InTransit }}.
 
 %% Return when we have found as many messages as requested.
 prepare_read(0, _, ReadMarker, _, _, Acc) ->
@@ -720,7 +730,7 @@ highest_continuous_seq_id([SeqId1, SeqId2|Tail])
         when (1 + SeqId1) =:= SeqId2 ->
     highest_continuous_seq_id([SeqId2|Tail]);
 highest_continuous_seq_id([SeqId|Tail]) ->
-    {SeqId, Tail}.
+    SeqId.
 
 highest_continuous_seq_id([SeqId|Tail], EndSeqId)
         when (1 + SeqId) =:= EndSeqId ->

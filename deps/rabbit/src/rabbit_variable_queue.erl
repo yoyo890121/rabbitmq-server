@@ -1975,9 +1975,11 @@ maybe_batch_write_index_to_disk(Force,
 maybe_batch_write_index_to_disk(_Force, MsgStatus, State) ->
     {MsgStatus, State}.
 
-maybe_write_index_to_disk(_Force, MsgStatus = #msg_status {
-                                    index_on_disk = true }, State) ->
-    {MsgStatus, State};
+%% @todo We should always behave as if the index is not on disk.
+%%       Or rather we should tell the index this message is no longer in transit.
+%maybe_write_index_to_disk(_Force, MsgStatus = #msg_status {
+%                                    index_on_disk = true }, State) ->
+%    {MsgStatus, State};
 maybe_write_index_to_disk(Force, MsgStatus = #msg_status {
                                    msg           = Msg,
                                    msg_id        = MsgId,
@@ -2047,7 +2049,7 @@ determine_persist_to(#basic_message{
                  end
     end.
 
-persist_to(#msg_status{persist_to = To}) -> To.
+persist_to(#msg_status{persist_to = _To}) -> msg_store. % To.
 
 prepare_to_store(Msg) ->
     Msg#basic_message{
