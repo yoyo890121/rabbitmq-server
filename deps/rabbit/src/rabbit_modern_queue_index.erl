@@ -394,7 +394,8 @@ deliver(SeqIds, State0) ->
     } = State,
     %% @todo Would be good to avoid this lists:sort/1 call.
     ReadMarker = maybe_advance_read_marker(ReadMarker0, lists:sort(SeqIds)),
-    InTransit = SeqIds ++ InTransit0,
+    %% @todo We probably shouldn't do this lists:usort as well. Hacky quick fix.
+    InTransit = lists:usort(SeqIds ++ InTransit0),
     State#mqistate{ read_marker = ReadMarker, in_transit = InTransit }.
 
 maybe_advance_read_marker(ReadMarker, [ReadMarker]) ->
@@ -416,13 +417,18 @@ maybe_advance_read_marker(ReadMarker, _) ->
 ack([], State) ->
     State;
 ack(SeqIds, State0 = #mqistate{ ack_marker = AckMarkerBefore }) ->
-    State = lists:foldl(fun(SeqId, State1) ->
+    State1 = lists:foldl(fun(SeqId, State1) ->
         {Fd, OffsetForSeqId, State2} = get_fd(SeqId, State1),
         {ok, _} = file:position(Fd, OffsetForSeqId),
         ok = file:write(Fd, <<1>>),
         update_ack_state(SeqId, State2)
     end, State0, SeqIds),
-    maybe_delete_segments(AckMarkerBefore, State).
+    State = maybe_delete_segments(AckMarkerBefore, State1),
+    %% We must also remove all the messages that were in transit.
+    #mqistate{ in_transit = InTransit } = State,
+    %% @todo Also remove everything below the ack_marker? Not sure why it's not all in the SeqIds...
+    %%       No. If there are things left in in_transit, that's because they were added to the list twice.
+    State#mqistate{ in_transit = InTransit -- SeqIds }.
 
 update_ack_state(SeqId, State = #mqistate{ ack_marker = undefined, acks = Acks }) ->
     %% We must special case when there is no ack_marker in the state.
