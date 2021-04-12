@@ -155,8 +155,10 @@ ensure_queue_name_stub_file(#resource{virtual_host = VHost, name = QName}, Dir) 
                                           "QUEUE: ", QName/binary, "\n">>).
 
 open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
+    SegmentEntryCount = segment_entry_count(),
+    Segment = WriteMarker div SegmentEntryCount,
     %% We only use 'read' here so the file doesn't get truncated.
-    {ok, Fd} = file:open(segment_file(WriteMarker, State), [read, write, raw]),
+    {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw]),
     %% When we are recovering from a shutdown we may need to check
     %% whether the file already has content. If it does, we do
     %% nothing. Otherwise, as well as in the normal case, we
@@ -170,7 +172,6 @@ open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
     end,
     case IsNewFile of
         true ->
-            SegmentEntryCount = segment_entry_count(),
             %% We preallocate space for the file when possible.
             %% We don't worry about failure here because an error
             %% is returned when the system doesn't support this feature.
@@ -729,7 +730,7 @@ segment_file(Segment, #mqistate{ dir = Dir }) ->
 highest_continuous_seq_id([SeqId1, SeqId2|Tail])
         when (1 + SeqId1) =:= SeqId2 ->
     highest_continuous_seq_id([SeqId2|Tail]);
-highest_continuous_seq_id([SeqId|Tail]) ->
+highest_continuous_seq_id([SeqId|_]) ->
     SeqId.
 
 highest_continuous_seq_id([SeqId|Tail], EndSeqId)
