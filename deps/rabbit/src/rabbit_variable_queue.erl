@@ -1903,6 +1903,7 @@ publish_delivered1(Msg = #basic_message { is_persistent = IsPersistent,
     MsgStatus = msg_status(IsPersistent1, true, SeqId, Msg, MsgProps, IndexMaxSize),
     %% @todo With modern queue we WANT to store the index on disk.
     {MsgStatus1, State1} = PersistFun(true, true, MsgStatus, State),
+%% @todo We want to write the deliver byte at the same time with modern queue index.
     State2 = record_pending_ack(m(MsgStatus1), State1),
     UC1 = gb_sets_maybe_insert(NeedsConfirming, MsgId, UC),
     State3 = stats({0, 1}, {none, MsgStatus1}, 0,

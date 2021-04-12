@@ -369,7 +369,9 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
                                                  write_fd = undefined })
     end.
 
-%% When marking delivers we only need to update the file(s) on disk.
+%% When marking delivers we need to update the file(s) on disk,
+%% to add the message to the in_transit list and possibly to
+%% advance the read_marker.
 
 -spec deliver([seq_id()], State) -> State when State::mqistate().
 
@@ -378,12 +380,29 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
 deliver([], State) ->
     State;
 deliver(SeqIds, State0) ->
-    lists:foldl(fun(SeqId, State1) ->
-        {Fd, OffsetForSeqId, State} = get_fd(SeqId, State1),
+    State = lists:foldl(fun(SeqId, FoldState0) ->
+        {Fd, OffsetForSeqId, FoldState} = get_fd(SeqId, FoldState0),
         {ok, _} = file:position(Fd, OffsetForSeqId + 1),
         ok = file:write(Fd, <<1>>),
-        State
-    end, State0, SeqIds).
+        FoldState
+    end, State0, SeqIds),
+    %% We need to update the in_transit list. We also update the
+    %% read_marker if necessary.
+    #mqistate{
+        read_marker = ReadMarker0,
+        in_transit = InTransit0
+    } = State,
+    %% @todo Would be good to avoid this lists:sort/1 call.
+    ReadMarker = maybe_advance_read_marker(ReadMarker0, lists:sort(SeqIds)),
+    InTransit = SeqIds ++ InTransit0,
+    State#mqistate{ read_marker = ReadMarker, in_transit = InTransit }.
+
+maybe_advance_read_marker(ReadMarker, [ReadMarker]) ->
+    ReadMarker + 1;
+maybe_advance_read_marker(ReadMarker, [ReadMarker|Tail]) ->
+    highest_continuous_seq_id(Tail) + 1;
+maybe_advance_read_marker(ReadMarker, _) ->
+    ReadMarker.
 
 %% When marking acks we need to update the file(s) on disk
 %% as well as update ack_marker and/or acks in the state.
