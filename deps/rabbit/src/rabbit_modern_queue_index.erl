@@ -150,8 +150,9 @@ init1(Name, Dir, OnSyncFun, OnSyncMsgFun) ->
 
 ensure_queue_name_stub_file(#resource{virtual_host = VHost, name = QName}, Dir) ->
     QueueNameFile = filename:join(Dir, ?QUEUE_NAME_STUB_FILE),
-    file:write_file(QueueNameFile, <<"VHOST: ", VHost/binary, "\n",
-                                     "QUEUE: ", QName/binary, "\n">>).
+    ok = filelib:ensure_dir(QueueNameFile),
+    ok = file:write_file(QueueNameFile, <<"VHOST: ", VHost/binary, "\n",
+                                          "QUEUE: ", QName/binary, "\n">>).
 
 open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
     %% We only use 'read' here so the file doesn't get truncated.
@@ -365,6 +366,10 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _TargetRamCount,
 
 -spec deliver([seq_id()], State) -> State when State::mqistate().
 
+%% The rabbit_variable_queue module may call this function
+%% with an empty list. Do nothing.
+deliver([], State) ->
+    State;
 deliver(SeqIds, State0) ->
     lists:foldl(fun(SeqId, State1) ->
         {Fd, OffsetForSeqId, State} = get_fd(SeqId, State1),
@@ -380,6 +385,10 @@ deliver(SeqIds, State0) ->
 
 -spec ack([seq_id()], State) -> State when State::mqistate().
 
+%% The rabbit_variable_queue module may call this function
+%% with an empty list. Do nothing.
+ack([], State) ->
+    State;
 ack(SeqIds, State0 = #mqistate{ ack_marker = AckMarkerBefore }) ->
     State = lists:foldl(fun(SeqId, State1) ->
         {Fd, OffsetForSeqId, State2} = get_fd(SeqId, State1),
@@ -396,18 +405,32 @@ update_ack_state(SeqId, State = #mqistate{ ack_marker = undefined, acks = Acks }
         0 -> State#mqistate{ ack_marker = 0 };
         _ -> State#mqistate{ acks = [SeqId|Acks] }
     end;
-update_ack_state(SeqId, State = #mqistate{ ack_marker = AckMarker0, acks = Acks }) ->
+update_ack_state(SeqId, State = #mqistate{ read_marker = ReadMarker0,
+                                           ack_marker = AckMarker0,
+                                           acks = Acks }) ->
     case AckMarker0 + 1 of
         %% When SeqId is the message after the marker, we update the marker
         %% and potentially remove additional SeqIds from the acks list. The
         %% new ack marker becomes either SeqId or the largest continuous
         %% seq_id() following SeqId found in Acks.
         SeqId ->
-            %% @todo We must also remove from the acks list!
             AckMarker = highest_continuous_seq_id(lists:sort([SeqId|Acks])),
-            %% @todo The read_marker may also advance. (Can it? Depends on if
-            %%       acks can arrive after a dirty restart I think.)
-            State#mqistate{ ack_marker = AckMarker };
+            RemainingAcks = lists:dropwhile(
+                fun(AckSeqId) -> AckSeqId =< AckMarker end,
+                lists:sort(Acks)),
+            %% When the ack marker gets past the read marker, we need to
+            %% advance the read marker.
+            %% @todo This is only necessary if acks can arrive after a
+            %%       dirty shutdown I believe.
+            ReadMarker = if
+                AckMarker >= ReadMarker0 ->
+                    AckMarker + 1;
+                true ->
+                    ReadMarker0
+            end,
+            State#mqistate{ read_marker = ReadMarker,
+                            ack_marker = AckMarker,
+                            acks = RemainingAcks };
         %% Otherwise we simply add the SeqId to the acks list.
         _ ->
             State#mqistate{ acks = [SeqId|Acks] }
@@ -646,9 +669,12 @@ flush(State) ->
                        {non_neg_integer(), non_neg_integer(), State}
                        when State::mqistate().
 
-bounds(State = #mqistate{oldest_segment=Oldest, newest_segment=Newest}) ->
-    SegmentEntryCount = segment_entry_count(),
-    {Oldest * SegmentEntryCount, (1 + Newest) * SegmentEntryCount, State}.
+%% @todo Implement so that we don't start at the second segment...
+%% @todo Second one must be write_marker.
+bounds(State) -> % = #mqistate{oldest_segment=Oldest, newest_segment=Newest}) ->
+    {0, 0, State}.
+%    SegmentEntryCount = segment_entry_count(),
+%    {Oldest * SegmentEntryCount, (1 + Newest) * SegmentEntryCount, State}.
 
 %% The next_segment_boundary/1 function is used internally when
 %% reading. It should not be called from rabbit_variable_queue.
@@ -664,8 +690,9 @@ next_segment_boundary(SeqId) ->
 %% Internal.
 
 segment_entry_count() ->
-    {ok, SegmentEntryCount} =
-        application:get_env(rabbit, modern_queue_index_segment_entry_count),
+    %% @todo Figure out what the best default would be.
+    SegmentEntryCount =
+        application:get_env(rabbit, modern_queue_index_segment_entry_count, 65536),
     SegmentEntryCount.
 
 erase_index_dir(Dir) ->
