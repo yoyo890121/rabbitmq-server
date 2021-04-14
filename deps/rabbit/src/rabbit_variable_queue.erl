@@ -1297,7 +1297,6 @@ msg_store_close_fds_fun(IsPersistent) ->
             State #vqstate { msg_store_clients = MSCState1 }
     end.
 
-%% @todo With modern index we always want to write on disk.
 maybe_write_delivered(false, _SeqId, IndexState) ->
     IndexState;
 maybe_write_delivered(true, SeqId, IndexState) ->
@@ -1997,10 +1996,13 @@ maybe_write_index_to_disk(Force, MsgStatus = #msg_status {
             msg_store   -> {MsgId, DiskWriteCount};
             queue_index -> {prepare_to_store(Msg), DiskWriteCount + 1}
         end,
-    IndexState1 = ?INDEX:publish(
-                    MsgOrId, SeqId, MsgProps, IsPersistent, TargetRamCount,
+    %% @todo We would benefit from having a publish function that has
+    %%       IsDelivered directly for the modern index. Do it all in
+    %%       one step.
+    IndexState2 = ?INDEX:publish(
+                    MsgOrId, SeqId, MsgProps, IsPersistent, IsDelivered, TargetRamCount,
                     IndexState),
-    IndexState2 = maybe_write_delivered(IsDelivered, SeqId, IndexState1),
+%    IndexState2 = maybe_write_delivered(IsDelivered, SeqId, IndexState1),
     {MsgStatus#msg_status{index_on_disk = true},
      State#vqstate{index_state      = IndexState2,
                    disk_write_count = DiskWriteCount1}};
