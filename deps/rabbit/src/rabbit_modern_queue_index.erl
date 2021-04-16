@@ -340,8 +340,8 @@ delete_and_terminate(State = #mqistate { dir = Dir,
 
 publish(MsgOrId, SeqId, Props, IsPersistent, _IsDelivered, TargetRamCount,
         State0 = #mqistate { write_marker = WriteMarker,
-                            read_marker = ReadMarker0,
-                            in_transit = InTransit })
+                             read_marker = ReadMarker0,
+                             in_transit = InTransit })
         when SeqId < WriteMarker ->
     ?DEBUG("~0p ~0p ~0p ~0p ~0p ~0p", [MsgOrId, SeqId, Props, IsPersistent, TargetRamCount, State0]),
     %% We have already written this message on disk. We do not need
@@ -365,8 +365,6 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _IsDelivered, TargetRamCount,
 %    end.
     State;
 
-%% @todo If we could get many messages published at once, we could
-%%       also write them all to disk at once.
 publish(MsgOrId, SeqId, Props, IsPersistent, IsDelivered, TargetRamCount,
         State0 = #mqistate { write_marker = WriteMarker,
                              write_buffer = WriteBuffer0 }) ->
@@ -409,7 +407,7 @@ maybe_flush_buffer(State0 = #mqistate { write_buffer = WriteBuffer0,
     PartialFlush = NumUpdates >= 100,
     {Writes, WriteBuffer} = maps:fold(fun
         (SeqId, ack, {WritesAcc, BufferAcc}) ->
-            %% @todo Should probably be <<2>> to indicate a ack, where <<1>> indicates an entry is there, <<0>> indicates a hole.
+            %% @todo Use a define for the offset. Use a define for the values.
             {acc_write(SeqId, SegmentEntryCount, <<2>>, +0, WritesAcc),
              BufferAcc};
         (SeqId, deliver, {WritesAcc, BufferAcc}) ->
@@ -689,7 +687,7 @@ delete_segment(Segment, State0 = #mqistate{ fds = OpenFds0 }) ->
 %% From is inclusive, To is exclusive.
 %% @todo This function is incompatible with the rabbit_queue_index function.
 %%       In our case we may send messages >= ToSeqId. As a result the
-%%       rabbit_variable_queue module will need to be accomodated.
+%%       rabbit_variable_queue module may need to be accomodated.
 
 read(FromSeqId, FromSeqId, State) ->
     ?DEBUG("~0p ~0p ~0p", [FromSeqId, FromSeqId, State]),
@@ -926,6 +924,9 @@ next_segment_boundary(SeqId) ->
 
 segment_entry_count() ->
     %% @todo Figure out what the best default would be.
+    %%       A value lower than the max write_buffer size results in nothing needing
+    %%       to be written to disk as long as the consumer consumes as fast as the
+    %%       producer produces.
     SegmentEntryCount =
         application:get_env(rabbit, modern_queue_index_segment_entry_count, 65536),
     SegmentEntryCount.
