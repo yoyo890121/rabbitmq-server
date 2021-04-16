@@ -43,6 +43,8 @@
 -type seq_id() :: non_neg_integer().
 %% @todo Use a shared seq_id() type in all relevant modules.
 
+-type entry() :: {rabbit_types:msg_id(), seq_id(), rabbit_types:message_properties(), boolean(), boolean()}.
+
 -record(mqistate, {
     %% Queue name (for the stub file).
     queue_name :: rabbit_amqqueue:name(),
@@ -54,6 +56,23 @@
     %% in the index. Messages are written sequentially.
     %% Messages are always written to the index.
     write_marker = 0 :: seq_id(),
+
+    %% Buffer of all write operations to be performed.
+    %% When the buffer reaches a certain size, we reduce
+    %% the buffer size by first checking if writing the
+    %% delivers and acks gets us to a comfortable buffer
+    %% size. If we do, write only the delivers and acks.
+    %% If not, write everything. This allows the reader
+    %% to continue reading from memory if it is fast
+    %% enough to keep up with the producer.
+    write_buffer = #{} :: #{seq_id() => entry() | deliver | ack},
+
+    %% The number of entries in the write buffer that
+    %% refer to an update to the file, rather than a
+    %% full entry. Updates include deliver and ack.
+    %% Used to determine if flushing only delivers/acks
+    %% is enough to get the buffer to a comfortable size.
+    write_buffer_updates = 0,
 
     %% seq_id() of the next message to be read from disk.
     %% After the read_marker position there may be messages
@@ -99,8 +118,7 @@
     %% @todo The current implementation does not limit the number of FDs open.
     %%       This is most likely not desirable... Perhaps we can have a limit
     %%       per queue index instead of relying on file_handle_cache.
-    write_fd = undefined :: file:fd() | undefined,
-    read_write_fds = #{} :: #{non_neg_integer() => file:fd()},
+    fds = #{} :: #{non_neg_integer() => file:fd()},
 
     %% These funs are specific to the rabbit_variable_queue
     %% implementation. It expects us to call them when we
@@ -150,7 +168,7 @@ init(#resource{ virtual_host = VHost } = Name, OnSyncFun, OnSyncMsgFun) ->
 
 init1(Name, Dir, OnSyncFun, OnSyncMsgFun) ->
     ensure_queue_name_stub_file(Name, Dir),
-    open_write_file(new, #mqistate{
+    ensure_segment_file(new, #mqistate{
         queue_name = Name,
         dir = Dir,
         on_sync = OnSyncFun,
@@ -163,11 +181,12 @@ ensure_queue_name_stub_file(#resource{virtual_host = VHost, name = QName}, Dir) 
     ok = file:write_file(QueueNameFile, <<"VHOST: ", VHost/binary, "\n",
                                           "QUEUE: ", QName/binary, "\n">>).
 
-open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
+ensure_segment_file(Reason, State = #mqistate{ write_marker = WriteMarker,
+                                               fds = OpenFds }) ->
     SegmentEntryCount = segment_entry_count(),
     Segment = WriteMarker div SegmentEntryCount,
     %% We only use 'read' here so the file doesn't get truncated.
-    {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw]),
+    {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw, binary]),
     %% When we are recovering from a shutdown we may need to check
     %% whether the file already has content. If it does, we do
     %% nothing. Otherwise, as well as in the normal case, we
@@ -201,8 +220,8 @@ open_write_file(Reason, State = #mqistate{ write_marker = WriteMarker }) ->
         false ->
             ok
     end,
-    %% All good.
-    State#mqistate{ write_fd = Fd }.
+    %% Keep the file open.
+    State#mqistate{ fds = OpenFds#{Segment => Fd} }.
 
 -spec reset_state(State) -> State when State::mqistate().
 
@@ -261,8 +280,8 @@ recover(#resource{ virtual_host = VHost } = Name, Terms, MsgStoreRecovered,
     %% need to worry about acked and unacked messages being
     %% interspersed because of this skip mechanism.
     State = State2#mqistate{ read_marker = Oldest * segment_entry_count() },
-    %% We can now open the write file and return.
-    {Count, Bytes, open_write_file(recover, State)}.
+    %% We can now ensure the current segment file is in a good state and return.
+    {Count, Bytes, ensure_segment_file(recover, State)}.
 
 %% This function will not play nice if there are non-integers
 %% file names with the same extension as segment files.
@@ -288,14 +307,11 @@ recover_sync_with_msg_store(_ContainsCheckFun, _State) ->
 -spec terminate(rabbit_types:vhost(), [any()], State) -> State when State::mqistate().
 
 terminate(VHost, Terms, State = #mqistate { dir = Dir,
-                                            write_fd = WriteFd,
-                                            read_write_fds = OpenFds,
+                                            fds = OpenFds,
                                             oldest_segment = Oldest,
                                             newest_segment = Newest }) ->
     ?DEBUG("~0p ~0p ~0p", [VHost, Terms, State]),
     %% Fsync and close all FDs.
-    ok = file:sync(WriteFd),
-    ok = file:close(WriteFd),
     _ = maps:map(fun(_, Fd) ->
         ok = file:sync(Fd),
         ok = file:close(Fd)
@@ -303,22 +319,20 @@ terminate(VHost, Terms, State = #mqistate { dir = Dir,
     %% Write recovery terms for faster recovery.
     rabbit_recovery_terms:store(VHost, filename:basename(Dir),
                                 [{mqi_segments, {Oldest, Newest}} | Terms]),
-    State#mqistate{ write_fd = undefined, read_write_fds = #{} }.
+    State#mqistate{ fds = #{} }.
 
 -spec delete_and_terminate(State) -> State when State::mqistate().
 
 delete_and_terminate(State = #mqistate { dir = Dir,
-                                         write_fd = WriteFd,
-                                         read_write_fds = OpenFds }) ->
+                                         fds = OpenFds }) ->
     ?DEBUG("~0p", [State]),
     %% Close all FDs.
-    ok = file:close(WriteFd),
     _ = maps:map(fun(_, Fd) ->
         ok = file:close(Fd)
     end, undefined, OpenFds),
     %% Erase the data on disk.
     ok = erase_index_dir(Dir),
-    State#mqistate{ write_fd = undefined, read_write_fds = #{} }.
+    State#mqistate{ fds = #{} }.
 
 -spec publish(rabbit_types:msg_id(), seq_id(),
                     rabbit_types:message_properties(), boolean(), boolean(),
@@ -351,42 +365,87 @@ publish(MsgOrId, SeqId, Props, IsPersistent, _IsDelivered, TargetRamCount,
 %    end.
     State;
 
-%% @todo The best case scenario should be that we never do this write,
-%%       we never do the deliver write, we only ever do the ack write.
-%%
-%%       Keep a cache of publishes. N is the total number of entries
-%%       we want to keep, M is the number of entries written at once.
-%%       We want to write only the older entries, preferrably all those
-%%       that have not yet been read. If the read_marker is far we
-%%       write everything however.
-%%
-%%       This is essentially an in-memory journal I suppose.
-%%
-%%       Probably best keep separate publishes, delivers, acks
-%%       that are scheduled for writing.
-
-%% @todo When we are publishing and the read_marker is close to the
-%%       write_marker, we can optimize things a bit by keeping the
-%%       entry in memory waiting for the read call to access it.
-
 %% @todo If we could get many messages published at once, we could
 %%       also write them all to disk at once.
 publish(MsgOrId, SeqId, Props, IsPersistent, IsDelivered, TargetRamCount,
         State0 = #mqistate { write_marker = WriteMarker,
-                             write_fd = WriteFd })
-        when SeqId =:= WriteMarker ->
+                             write_buffer = WriteBuffer0 }) ->
     ?DEBUG("~0p ~0p ~0p ~0p ~0p ~0p", [MsgOrId, SeqId, Props, IsPersistent, TargetRamCount, State0]),
-    %% Prepare the entry to be written.
+    %% When the message was delivered we need to add it to
+    %% the in_transit list and possibly advance the read_marker.
+    State1 = case IsDelivered of
+        true -> mark_in_transit([SeqId], State0);
+        false -> State0
+    end,
+    %% We can then add the entry to the write buffer.
     Id = case MsgOrId of
         #basic_message{id = Id0} -> Id0;
         Id0 when is_binary(Id0) -> Id0
     end,
-    %% When the message was delivered we need to add it to
-    %% the in_transit list and possibly advance the read_marker.
-    %% @todo read marker
-    {IsDeliveredFlag, State} = case IsDelivered of
-        true -> {1, mark_in_transit([SeqId], State0)};
-        false -> {0, State0}
+    WriteBuffer = WriteBuffer0#{SeqId => {Id, SeqId, Props, IsPersistent, IsDelivered}},
+    NextWriteMarker = WriteMarker + 1,
+    State2 = State1#mqistate{ write_marker = NextWriteMarker,
+                              write_buffer = WriteBuffer },
+    %% When the write_marker ends up on a new segment we must
+    %% prepare the new segment file even if we don't flush
+    %% the buffer and write to that file yet.
+    SegmentEntryCount = segment_entry_count(),
+    ThisSegment = WriteMarker div SegmentEntryCount,
+    NextSegment = NextWriteMarker div SegmentEntryCount,
+    State = case ThisSegment =:= NextSegment of
+        true -> State2;
+        false -> ensure_segment_file(new, State2)
+    end,
+    maybe_flush_buffer(State).
+
+%% @todo Perhaps make the two limits configurable.
+maybe_flush_buffer(State = #mqistate { write_buffer = WriteBuffer })
+        when map_size(WriteBuffer) < 2000 ->
+    State;
+maybe_flush_buffer(State0 = #mqistate { write_buffer = WriteBuffer0,
+                                        write_buffer_updates = NumUpdates }) ->
+    SegmentEntryCount = segment_entry_count(),
+    %% First we prepare the writes sorted by segment.
+    PartialFlush = NumUpdates >= 100,
+    {Writes, WriteBuffer} = maps:fold(fun
+        (SeqId, ack, {WritesAcc, BufferAcc}) ->
+            %% @todo Should probably be <<2>> to indicate a ack, where <<1>> indicates an entry is there, <<0>> indicates a hole.
+            {acc_write(SeqId, SegmentEntryCount, <<2>>, +0, WritesAcc),
+             BufferAcc};
+        (SeqId, deliver, {WritesAcc, BufferAcc}) ->
+            %% @todo Use a define for the offset. Use a define for the values.
+            {acc_write(SeqId, SegmentEntryCount, <<1>>, +1, WritesAcc),
+             BufferAcc};
+        %% When there are 100+ deliver | ack updates, we only write
+        %% those and get the buffer back to a comfortable level.
+        (SeqId, Entry, {WritesAcc, BufferAcc}) when PartialFlush ->
+            {WritesAcc,
+             BufferAcc#{SeqId => Entry}};
+        %% Otherwise we write the entire buffer.
+        (SeqId, Entry, {WritesAcc, BufferAcc}) ->
+            {acc_write(SeqId, SegmentEntryCount, build_entry(Entry), +0, WritesAcc),
+             BufferAcc}
+    end, {#{}, #{}}, WriteBuffer0),
+    %% Then we do the writes for each segment.
+    State = maps:fold(fun(Segment, LocBytes, FoldState0) ->
+        {Fd, FoldState} = get_fd_for_segment(Segment, FoldState0),
+        ok = file:pwrite(Fd, LocBytes),
+        FoldState
+    end, State0, Writes),
+    %% Finally we update the state.
+    State#mqistate{ write_buffer = WriteBuffer,
+                    write_buffer_updates = 0 }.
+
+acc_write(SeqId, SegmentEntryCount, Bytes, EntryOffset, WritesAcc) ->
+    Segment = SeqId div SegmentEntryCount,
+    LocBytesAcc = maps:get(Segment, WritesAcc, []),
+    Offset = ?HEADER_SIZE + (SeqId rem SegmentEntryCount) * ?ENTRY_SIZE + EntryOffset,
+    WritesAcc#{Segment => [{Offset, Bytes}|LocBytesAcc]}.
+
+build_entry({Id, _SeqId, Props, IsPersistent, IsDelivered}) ->
+    IsDeliveredFlag = case IsDelivered of
+        true -> 1;
+        false -> 0
     end,
     Flags = case IsPersistent of
         true -> 1;
@@ -397,33 +456,24 @@ publish(MsgOrId, SeqId, Props, IsPersistent, IsDelivered, TargetRamCount,
         undefined -> 0;
         _ -> Expiry0
     end,
-    Entry = << 0:8,                   %% ACK.
-               IsDeliveredFlag:8,     %% Deliver.
-               Flags:8,               %% IsPersistent flag (least significant bit).
-               0:8,                   %% Reserved. Makes entries 32B in size to match page alignment on disk.
-               Id:16/binary,          %% Message store ID.
-               Size:32/unsigned,      %% Message payload size.
-               Expiry:64/unsigned >>, %% Expiration time.
-    ok = file:write(WriteFd, Entry),
-    NextWriteMarker = WriteMarker + 1,
-    %% When the write_marker ends up on a new segment we must
-    %% sync, close this file and open the next. We sync here
-    %% because we want to avoid having two partially written
-    %% segment files in case of dirty shutdowns.
-    SegmentEntryCount = segment_entry_count(),
-    ThisSegment = WriteMarker div SegmentEntryCount,
-    NextSegment = NextWriteMarker div SegmentEntryCount,
-    case ThisSegment =:= NextSegment of
-        true ->
-            State#mqistate{ write_marker = NextWriteMarker };
-        false ->
-            ok = file:sync(WriteFd),
-            ok = file:close(WriteFd),
-            open_write_file(new, State#mqistate{ write_marker = NextWriteMarker,
-                                                 write_fd = undefined })
+    << 1:8,                   %% ACK. 0 = no entry, 1 = entry exists, 2 = entry acked
+       IsDeliveredFlag:8,     %% Deliver.
+       Flags:8,               %% IsPersistent flag (least significant bit).
+       0:8,                   %% Reserved. Makes entries 32B in size to match page alignment on disk.
+       Id:16/binary,          %% Message store ID.
+       Size:32/unsigned,      %% Message payload size.
+       Expiry:64/unsigned >>. %% Expiration time.
+
+get_fd_for_segment(Segment, State = #mqistate{ fds = OpenFds }) ->
+    case OpenFds of
+        #{ Segment := Fd } ->
+            {Fd, State};
+        _ ->
+            {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw, binary]),
+            {Fd, State#mqistate{ fds = OpenFds#{ Segment => Fd }}}
     end.
 
-%% When marking delivers we need to update the file(s) on disk.
+%% When marking delivers we may need to update the file(s) on disk.
 
 -spec deliver([seq_id()], State) -> State when State::mqistate().
 
@@ -432,27 +482,33 @@ publish(MsgOrId, SeqId, Props, IsPersistent, IsDelivered, TargetRamCount,
 deliver([], State) ->
     ?DEBUG("[] ~0p", [State]),
     State;
-deliver(SeqIds, State0) ->
+deliver(SeqIds, State0 = #mqistate { write_buffer = WriteBuffer0,
+                                     write_buffer_updates = NumUpdates0 }) ->
     ?DEBUG("~0p ~0p", [SeqIds, State0]),
-    %% @todo Maybe we can also delay writing those so that we have
-    %%       more entries to update at once. Or leave it up to the
-    %%       user of this module. Also if we wait a little bit for
-    %%       the ack then we can avoid this operation entirely. It
-    %%       costs us about 20% of throughput (just the write).
-    PWrites = prepare_pwrite(SeqIds, segment_entry_count(), 1, #{}),
-    State = maps:fold(fun(Segment, LocBytes, FoldState0) ->
-        {Fd, FoldState} = get_fd_for_segment(Segment, FoldState0),
-        ok = file:pwrite(Fd, LocBytes),
-        FoldState
-    end, State0, PWrites),
-    %% We need to update the in_transit list. We also update the
-    %% read_marker if necessary.
-    mark_in_transit(SeqIds, State).
-
-%% @todo OK I don't understand this.
-%%
-%% OK this happens because when a consumer is connected, the queue
-%% may call publish and deliver one after the other.
+    %% Update the in_transit list. We also update the read_marker if necessary.
+    %% @todo Is this still necessary with publish taking care of delivers?
+    %%       This was necessary before because publish and deliver were called one after the other.
+    State = mark_in_transit(SeqIds, State0),
+    %% Add delivers to the write buffer if necessary.
+    {WriteBuffer, NumUpdates} = lists:foldl(fun
+        (SeqId, {FoldBuffer, FoldUpdates}) ->
+            case FoldBuffer of
+                %% Update the IsDelivered flag in the entry if any.
+                #{SeqId := {Id, SeqId, Props, IsPersistent, false}} ->
+                    {FoldBuffer#{SeqId => {Id, SeqId, Props, IsPersistent, true}},
+                     FoldUpdates};
+                %% If any other write exists, do nothing.
+                #{SeqId := _} ->
+                    {FoldBuffer,
+                     FoldUpdates};
+                %% Otherwise mark for delivery and increase the updates count.
+                _ ->
+                    {FoldBuffer#{SeqId => deliver},
+                     FoldUpdates + 1}
+            end
+    end, {WriteBuffer0, NumUpdates0}, SeqIds),
+    maybe_flush_buffer(State#mqistate{ write_buffer = WriteBuffer,
+                                       write_buffer_updates = NumUpdates }).
 
 mark_in_transit(SeqIds, State = #mqistate{ read_marker = ReadMarker0,
                                            in_transit = InTransit0 }) ->
@@ -461,24 +517,6 @@ mark_in_transit(SeqIds, State = #mqistate{ read_marker = ReadMarker0,
     %% @todo We probably shouldn't do this lists:usort as well. Hacky quick fix.
     InTransit = lists:usort(SeqIds ++ InTransit0),
     State#mqistate{ read_marker = ReadMarker, in_transit = InTransit }.
-
-prepare_pwrite([], _, _, Acc) ->
-    Acc;
-prepare_pwrite([SeqId|Tail], SegmentEntryCount, EntryOffset, Acc) ->
-    Segment = SeqId div SegmentEntryCount,
-    LocBytesAcc = maps:get(Segment, Acc, []),
-    Offset = ?HEADER_SIZE + (SeqId rem SegmentEntryCount) * ?ENTRY_SIZE + EntryOffset,
-    prepare_pwrite(Tail, SegmentEntryCount, EntryOffset,
-                   Acc#{Segment => [{Offset, <<1>>}|LocBytesAcc]}).
-
-get_fd_for_segment(Segment, State = #mqistate{ read_write_fds = OpenFds }) ->
-    case OpenFds of
-        #{ Segment := Fd } ->
-            {Fd, State};
-        _ ->
-            {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw, binary]),
-            {Fd, State#mqistate{ read_write_fds = OpenFds#{ Segment => Fd }}}
-    end.
 
 maybe_advance_read_marker(ReadMarker, [ReadMarker]) ->
     ReadMarker + 1;
@@ -499,78 +537,121 @@ maybe_advance_read_marker(ReadMarker, _) ->
 ack([], State) ->
     ?DEBUG("[] ~0p", [State]),
     State;
-ack(SeqIds, State0 = #mqistate{ ack_marker = AckMarkerBefore }) ->
-    ?DEBUG("~0p ~0p", [SeqIds, State0]),
-    %% @todo We should probably delay writing those a bit.
-    %%       See comment in deliver/2.
-    State1 = lists:foldl(fun(SeqId, FoldState0) ->
-        {Fd, OffsetForSeqId, FoldState} = get_fd(SeqId, FoldState0),
-        %% @todo Use file:pwrite/2?
-        ok = file:pwrite(Fd, OffsetForSeqId, <<1>>),
-        %% @todo We can probably avoid calling this in a loop,
-        %%       especially if the acks are continuous.
-        %%
-        %% @todo We should just add to the acks list, and then
-        %%       do update_ack_state once.
-        update_ack_state(SeqId, FoldState)
-    end, State0, SeqIds),
-    State = maybe_delete_segments(AckMarkerBefore, State1),
-    %% We must also remove all the messages that were in transit.
-    #mqistate{ in_transit = InTransit } = State,
+ack(SeqIds0, State0 = #mqistate{ write_buffer = WriteBuffer0,
+                                 write_buffer_updates = NumUpdates0,
+                                 in_transit = InTransit0,
+                                 ack_marker = AckMarkerBefore }) ->
+    ?DEBUG("~0p ~0p", [SeqIds0, State0]),
+    %% We start by removing all the messages that were in transit.
     %% @todo Also remove everything below the ack_marker? Not sure why it's not all in the SeqIds...
     %%       No. If there are things left in in_transit, that's because they were added to the list twice.
-    State#mqistate{ in_transit = InTransit -- SeqIds }.
+    InTransit = InTransit0 -- SeqIds0,
+    %% We continue by updating the ack state information. We then
+    %% use this information to determine if we can delete
+    %% segment files on disk.
+    State1 = update_ack_state(SeqIds0, State0),
+    {HighestSegmentDeleted, State} = maybe_delete_segments(AckMarkerBefore, State1),
+    %% When there were deleted files, we remove the seq_id()s that
+    %% belong to deleted files from the acked list, as well as any
+    %% write instructions in the buffer targeting those files.
+    {SeqIds, WriteBuffer2, NumUpdates2} = case HighestSegmentDeleted of
+        undefined ->
+            {SeqIds0, WriteBuffer0, NumUpdates0};
+        _ ->
+            %% All seq_id()s below this belong to a segment that has been
+            %% fully acked and is no longer tracked by the index.
+            LowestSeqId = (1 + HighestSegmentDeleted) * segment_entry_count(),
+            SeqIds1 = lists:filter(fun(FilterSeqId) ->
+                FilterSeqId >= LowestSeqId
+            end, SeqIds0),
+            {WriteBuffer1, NumUpdates1} = maps:fold(fun
+                (FoldSeqId, Write, {FoldBuffer, FoldUpdates}) when FoldSeqId < LowestSeqId ->
+                    Num = case Write of
+                        deliver -> 1;
+                        ack -> 1;
+                        _ -> 0
+                    end,
+                    {FoldBuffer, FoldUpdates - Num};
+                (SeqId, Write, {FoldBuffer, FoldUpdates}) ->
+                    {FoldBuffer#{SeqId => Write}, FoldUpdates}
+            end, {#{}, NumUpdates0}, WriteBuffer0),
+            {SeqIds1, WriteBuffer1, NumUpdates1}
+    end,
+    %% Finally we add any remaining acks to the write buffer.
+    {WriteBuffer, NumUpdates} = lists:foldl(fun
+        (SeqId, {FoldBuffer, FoldUpdates}) ->
+            case FoldBuffer of
+                %% Ack if the entry was already marked for delivery or acked.
+                %% @todo Is this possible to have ack here? Shouldn't this be an error?
+                #{SeqId := Write} when Write =:= deliver; Write =:= ack ->
+                    {FoldBuffer#{SeqId => ack},
+                     FoldUpdates};
+                %% Otherwise unconditionally ack. We replace the entry if any.
+                _ ->
+                    {FoldBuffer#{SeqId => ack},
+                     FoldUpdates + 1}
+            end
+    end, {WriteBuffer2, NumUpdates2}, SeqIds),
+    maybe_flush_buffer(State#mqistate{ write_buffer = WriteBuffer,
+                                       write_buffer_updates = NumUpdates,
+                                       in_transit = InTransit }).
 
-update_ack_state(SeqId, State = #mqistate{ ack_marker = undefined, acks = Acks }) ->
+update_ack_state(SeqIds, State = #mqistate{ ack_marker = undefined, acks = Acks0 }) ->
+    Acks = lists:sort(SeqIds ++ Acks0),
     %% We must special case when there is no ack_marker in the state.
     %% The message with seq_id() 0 has not been acked before now.
-    case SeqId of
-        0 -> State#mqistate{ ack_marker = 0 };
-        _ -> State#mqistate{ acks = [SeqId|Acks] }
+    case Acks of
+        [0|_] ->
+            update_markers(Acks, State);
+        _ ->
+            State#mqistate{ acks = Acks }
     end;
-update_ack_state(SeqId, State = #mqistate{ read_marker = ReadMarker0,
-                                           ack_marker = AckMarker0,
-                                           acks = Acks }) ->
-    case AckMarker0 + 1 of
+update_ack_state(SeqIds, State = #mqistate{ ack_marker = AckMarker, acks = Acks0 }) ->
+    Acks = lists:sort(SeqIds ++ Acks0),
+    case Acks of
         %% When SeqId is the message after the marker, we update the marker
         %% and potentially remove additional SeqIds from the acks list. The
-        %% new ack marker becomes either SeqId or the largest continuous
-        %% seq_id() following SeqId found in Acks.
-        SeqId ->
-            AckMarker = highest_continuous_seq_id(lists:sort([SeqId|Acks])),
-            RemainingAcks = lists:dropwhile(
-                fun(AckSeqId) -> AckSeqId =< AckMarker end,
-                lists:sort(Acks)),
-            %% When the ack marker gets past the read marker, we need to
-            %% advance the read marker.
-            %% @todo This is only necessary if acks can arrive after a
-            %%       dirty shutdown I believe.
-            ReadMarker = if
-                AckMarker >= ReadMarker0 ->
-                    AckMarker + 1;
-                true ->
-                    ReadMarker0
-            end,
-            State#mqistate{ read_marker = ReadMarker,
-                            ack_marker = AckMarker,
-                            acks = RemainingAcks };
-        %% Otherwise we simply add the SeqId to the acks list.
+        %% new ack marker becomes the largest continuous seq_id() found in
+        %% Acks.
+        [SeqId|_] when SeqId =:= AckMarker + 1 ->
+            update_markers(Acks, State);
         _ ->
-            State#mqistate{ acks = [SeqId|Acks] }
+            State#mqistate{ acks = Acks }
     end.
+
+update_markers(Acks, State = #mqistate { read_marker = ReadMarker0 }) ->
+    AckMarker = highest_continuous_seq_id(Acks),
+    RemainingAcks = lists:dropwhile(
+        fun(AckSeqId) -> AckSeqId =< AckMarker end,
+        Acks),
+    %% Advance the read_marker if the ack_marker got past it.
+    %% @todo This is only necessary if acks can arrive after a
+    %%       dirty shutdown I believe.
+    ReadMarker = if
+        AckMarker >= ReadMarker0 -> AckMarker + 1;
+        true -> ReadMarker0
+    end,
+    State#mqistate{ read_marker = ReadMarker,
+                    ack_marker = AckMarker,
+                    acks = RemainingAcks }.
 
 maybe_delete_segments(AckMarkerBefore, State = #mqistate{ ack_marker = AckMarkerAfter }) ->
     SegmentEntryCount = segment_entry_count(),
+    %% We add one because the ack_marker points to the highest
+    %% continuous acked message, and we want to know which
+    %% segment is after that, so that we immediately remove
+    %% a fully-acked file when ack_marker points to the last
+    %% entry in the file.
     SegmentBefore = case AckMarkerBefore of
         undefined -> 0;
-        _ -> AckMarkerBefore div SegmentEntryCount
+        _ -> (1 + AckMarkerBefore) div SegmentEntryCount
     end,
-    SegmentAfter = AckMarkerAfter div SegmentEntryCount,
+    SegmentAfter = (1 + AckMarkerAfter) div SegmentEntryCount,
     if
         %% When the marker still points to the same segment,
         %% do nothing.
         SegmentBefore =:= SegmentAfter ->
-            State;
+            {undefined, State};
         %% When the marker points to a different segment,
         %% delete fully acked segment files.
         true ->
@@ -578,22 +659,17 @@ maybe_delete_segments(AckMarkerBefore, State = #mqistate{ ack_marker = AckMarker
     end.
 
 delete_segments(Segment, Segment, State) ->
-    delete_segment(Segment, State);
+    {Segment, delete_segment(Segment, State)};
 delete_segments(Segment, LastSegment, State) ->
     delete_segments(Segment + 1, LastSegment,
         delete_segment(Segment, State)).
 
-%% We do not need to worry about closing the write_fd because it is
-%% not possible to have a fully acked segment file also opened as
-%% a write file. The writer closes the file as soon as it reaches
-%% the maximum number of entries.
-
-delete_segment(Segment, State0 = #mqistate{ read_write_fds = OpenFds0 }) ->
+delete_segment(Segment, State0 = #mqistate{ fds = OpenFds0 }) ->
     %% We close the open fd if any.
     State = case maps:take(Segment, OpenFds0) of
         {Fd, OpenFds} ->
             ok = file:close(Fd),
-            State0#mqistate{ read_write_fds = OpenFds };
+            State0#mqistate{ fds = OpenFds };
         error ->
             State0
     end,
@@ -607,9 +683,7 @@ delete_segment(Segment, State0 = #mqistate{ read_write_fds = OpenFds0 }) ->
 %% either N messages or less depending on the current state.
 
 -spec read(seq_id(), seq_id(), State) ->
-                     {[{rabbit_types:msg_id(), seq_id(),
-                        rabbit_types:message_properties(),
-                        boolean(), boolean()}], State}
+                     {[entry()], State}
                      when State::mqistate().
 
 %% From is inclusive, To is exclusive.
@@ -622,16 +696,21 @@ read(FromSeqId, FromSeqId, State) ->
     {[], State};
 read(FromSeqId, ToSeqId, State) ->
     ?DEBUG("~0p ~0p ~0p", [FromSeqId, ToSeqId, State]),
-    read(ToSeqId - FromSeqId, State).
+    %% @todo Temporary read_marker here. Yeah we really ought to follow the same interface... Sigh.
+    read(ToSeqId - FromSeqId, State#mqistate{ read_marker = FromSeqId }).
 
 %% There might be messages after the read marker that were acked.
 %% We need to skip those messages when we attempt to read them.
 
-read(_, State = #mqistate{ write_marker = WriteMarker, read_marker = ReadMarker })
+read(_, State = #mqistate{ write_marker = WriteMarker,
+                           read_marker = ReadMarker })
         when WriteMarker =:= ReadMarker ->
     {[], State};
-read(Num, State0 = #mqistate{ write_marker = WriteMarker, read_marker = ReadMarker,
-                              in_transit = InTransit0, acks = Acks  }) ->
+read(Num, State0 = #mqistate{ write_marker = WriteMarker,
+                              write_buffer = WriteBuffer,
+                              read_marker = ReadMarker,
+                              in_transit = InTransit0,
+                              acks = Acks  }) ->
     %% The first message is always readable. It cannot be acked
     %% because if it was, the ack_marker would advance, and the
     %% read_marker would advance as well. It cannot be in_transit,
@@ -641,13 +720,19 @@ read(Num, State0 = #mqistate{ write_marker = WriteMarker, read_marker = ReadMark
                                                    ReadMarker + 1, InTransit0,
                                                    Acks, []),
     SeqIdsToRead = [ReadMarker|SeqIdsToRead0],
-    {Reads, State} = read_from_disk(SeqIdsToRead,
-                                    State0#mqistate{ read_marker = NextReadMarker },
-                                    []),
+    %% We first try to read from the write buffer what we can,
+    %% then we read the rest from disk.
+    {Reads0, SeqIdsOnDisk} = read_from_buffer(SeqIdsToRead,
+                                              WriteBuffer,
+                                              [], []),
+    {Reads, State} = read_from_disk(SeqIdsOnDisk,
+                                    State0,
+                                    Reads0),
     %% We add the messages that have been read to the in_transit list.
     InTransit = lists:foldl(fun({_, SeqId, _, _, _}, Acc) -> [SeqId|Acc] end,
                             InTransit0, Reads),
-    {Reads, State#mqistate{ in_transit = InTransit }}.
+    {Reads, State#mqistate{ read_marker = NextReadMarker,
+                            in_transit = InTransit }}.
 
 %% Return when we have found as many messages as requested.
 prepare_read(0, _, ReadMarker, _, _, Acc) ->
@@ -664,7 +749,7 @@ prepare_read(Num, WriteMarker, ReadMarker, InTransit, Acks, Acc) ->
     %% We arbitrarily look into the in_transit list first.
     %% It is unknown whether looking into the acks list
     %% first would provide better performance.
-    Skip = lists:member(ReadMarker, InTransit)
+    Skip = lists:member(ReadMarker, lists:usort(InTransit))
         orelse lists:member(ReadMarker, Acks),
     case Skip of
         true ->
@@ -673,12 +758,24 @@ prepare_read(Num, WriteMarker, ReadMarker, InTransit, Acks, Acc) ->
             prepare_read(Num - 1, WriteMarker, ReadMarker + 1, InTransit, Acks, [ReadMarker|Acc])
     end.
 
+read_from_buffer([], _, SeqIdsOnDisk, Reads) ->
+    {Reads, SeqIdsOnDisk};
+read_from_buffer([SeqId|Tail], WriteBuffer, SeqIdsOnDisk, Reads) ->
+    case WriteBuffer of
+        #{SeqId := ack} ->
+            read_from_buffer(Tail, WriteBuffer, SeqIdsOnDisk, Reads);
+        #{SeqId := Entry} when is_tuple(Entry) ->
+            read_from_buffer(Tail, WriteBuffer, SeqIdsOnDisk, [Entry|Reads]);
+        _ ->
+            read_from_buffer(Tail, WriteBuffer, [SeqId|SeqIdsOnDisk], Reads)
+    end.
+
 %% We try to minimize the number of file:read calls when reading from
 %% the disk. We find the number of continuous messages, read them all
 %% at once, and then repeat the loop.
 
 read_from_disk([], State, Acc) ->
-    {lists:reverse(Acc), State};
+    {Acc, State};
 read_from_disk(SeqIdsToRead0, State0, Acc0) ->
     FirstSeqId = hd(SeqIdsToRead0),
     %% We get the highest continuous seq_id() from the same segment file.
@@ -695,7 +792,7 @@ read_from_disk(SeqIdsToRead0, State0, Acc0) ->
     Acc = parse_entries(EntriesBin, FirstSeqId, Acc0),
     read_from_disk(SeqIdsToRead, State, Acc).
 
-get_fd(SeqId, State = #mqistate{ read_write_fds = OpenFds }) ->
+get_fd(SeqId, State = #mqistate{ fds = OpenFds }) ->
     SegmentEntryCount = segment_entry_count(),
     Segment = SeqId div SegmentEntryCount,
     Offset = ?HEADER_SIZE + (SeqId rem SegmentEntryCount) * ?ENTRY_SIZE,
@@ -704,7 +801,7 @@ get_fd(SeqId, State = #mqistate{ read_write_fds = OpenFds }) ->
             {Fd, Offset, State};
         _ ->
             {ok, Fd} = file:open(segment_file(Segment, State), [read, write, raw, binary]),
-            {Fd, Offset, State#mqistate{ read_write_fds = OpenFds#{ Segment => Fd }}}
+            {Fd, Offset, State#mqistate{ fds = OpenFds#{ Segment => Fd }}}
     end.
 
 %% When recovering from a dirty shutdown, we may end up reading entries that
@@ -713,7 +810,7 @@ get_fd(SeqId, State = #mqistate{ read_write_fds = OpenFds }) ->
 
 parse_entries(<<>>, _, Acc) ->
     Acc;
-parse_entries(<< IsAcked:8,
+parse_entries(<< Status:8,
                  IsDelivered:8,
                  _:7, IsPersistent:1,
                  _:8,
@@ -723,8 +820,8 @@ parse_entries(<< IsAcked:8,
                  Rest/bits >>, SeqId, Acc) ->
     %% We skip entries that have already been acked. This may only
     %% happen when we recover from a dirty shutdown.
-    case IsAcked of
-        0 ->
+    case Status of
+        1 ->
             %% We get the Id binary in two steps because we do not want
             %% to create a sub-binary and keep the larger binary around
             %% in memory.
@@ -734,8 +831,9 @@ parse_entries(<< IsAcked:8,
                 _ -> Expiry0
             end,
             Props = #message_properties{expiry = Expiry, size = Size},
+            %% @todo We need to check if we have a 'deliver' in the write buffer as well.
             parse_entries(Rest, SeqId + 1, [{Id, SeqId, Props, IsPersistent =:= 1, IsDelivered =:= 1}|Acc]);
-        1 ->
+        2 ->
             %% @todo It would be good to keep track of how many "misses"
             %%       we have. We can use it to confirm the correct behavior
             %%       of the module in tests, as well as an occasionally
