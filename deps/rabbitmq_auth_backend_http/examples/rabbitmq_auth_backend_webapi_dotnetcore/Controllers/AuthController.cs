@@ -1,7 +1,7 @@
-﻿using System;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using RabbitMqAuthBackendHttp.Requests;
+using System;
 
 namespace RabbitMqAuthBackendHttp.Controllers
 {
@@ -24,9 +24,9 @@ namespace RabbitMqAuthBackendHttp.Controllers
 
         [Route("user")]
         [HttpPost]
-        public IActionResult CheckUser([FromForm]UserAuthRequest request)
+        public IActionResult CheckUser([FromForm] UserAuthRequest request)
         {
-            var tags = new [] {"administrator", "management"};
+            var tags = new[] { "administrator", "management" };
 
             try
             {
@@ -47,7 +47,7 @@ namespace RabbitMqAuthBackendHttp.Controllers
 
         [Route("vhost")]
         [HttpPost]
-        public IActionResult CheckVhost([FromForm]VhostAuthRequest request)
+        public IActionResult CheckVhost([FromForm] VhostAuthRequest request)
         {
             try
             {
@@ -67,7 +67,7 @@ namespace RabbitMqAuthBackendHttp.Controllers
 
         [Route("resource")]
         [HttpPost]
-        public IActionResult CheckResource([FromForm]ResourceAuthRequest request)
+        public IActionResult CheckResource([FromForm] ResourceAuthRequest request)
         {
             try
             {
@@ -88,7 +88,7 @@ namespace RabbitMqAuthBackendHttp.Controllers
 
         [Route("topic")]
         [HttpPost]
-        public IActionResult CheckTopic([FromForm]TopicAuthRequest request)
+        public IActionResult CheckTopic([FromForm] TopicAuthRequest request)
         {
             try
             {
