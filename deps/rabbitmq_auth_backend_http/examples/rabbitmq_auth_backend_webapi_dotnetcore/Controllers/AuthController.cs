@@ -1,7 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using RabbitMqAuthBackendHttp.Requests;
-using System;
 
 namespace RabbitMqAuthBackendHttp.Controllers
 {
